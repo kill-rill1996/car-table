@@ -1,8 +1,11 @@
 import csv
+import time
 from typing import List
 from datetime import datetime
 from config import config
 import openpyxl
+
+RANDOM_OEM = int(datetime.now().timestamp() * 1_000_000)
 
 
 def main():
@@ -17,7 +20,7 @@ def main():
 
 
 def write_result_file(filename: str) -> (int, List[int]):
-    """Получение данных из файла выгрузки из 1С, запись в рузельтирующий файл, возвращение ошибок"""
+    """Получение данных из файла выгрузки из 1С, запись в результирующий файл, возвращение ошибок"""
     skip_row_count = 0
     skipped_rows = []
 
@@ -31,17 +34,20 @@ def write_result_file(filename: str) -> (int, List[int]):
                 count += 1
                 continue
 
-            if count > 10:
+            # debug version
+            if count > 50:
                 break
 
             print(f"Обрабатывается строка № {count}")
 
+            # пропускаем неполные и пустые строки
             if len(row) < 34 or row[0] != "Товары":
                 count += 1
                 skip_row_count += 1
                 skipped_rows.append(count)
                 continue
 
+            # получаем готовую строку для записи
             result_row = get_result_row(row)
 
             write_to_csv_file(result_row)
@@ -121,7 +127,7 @@ def get_product_types(group_M: str, sub_group_N: str) -> list:
 
 # TODO разобраться с пробелами
 def get_OEM_field(row: list) -> str:
-    """Получает ОЕМ из 1С колонка F or H or L"""
+    """Получает ОЕМ из 1С колонка F or H or L или случайное число"""
     if row[5].replace(" ", ""):
         oem = row[5]
     elif row[7].replace(" ", ""):
@@ -129,11 +135,13 @@ def get_OEM_field(row: list) -> str:
     elif row[3].replace(" ", ""):
         oem = row[3]
     else:
-        oem = get_random_OEM()
+        global RANDOM_OEM
+        oem = str(RANDOM_OEM)
+        RANDOM_OEM += 1
 
-    if type(oem) == str:
-        if "E+" in oem:
-            oem = get_random_OEM()
+    # if type(oem) == str:
+    #     if "E+" in oem:
+    #         oem = get_random_OEM()
 
     return oem
 
@@ -184,4 +192,7 @@ def write_error_rows(skip_row_count: int, skipped_rows: List[int]):
 
 
 if __name__ == "__main__":
+    start = datetime.now()
     main()
+    end = datetime.now()
+    print(end - start)
