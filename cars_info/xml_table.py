@@ -15,6 +15,7 @@ def main():
     download_xml_cars_file()
     result_rows = get_all_cars_info()
     write_csv_file(result_rows)
+    os.remove(XML_FILE_NAME)
 
 
 def download_xml_cars_file():
@@ -62,13 +63,13 @@ def write_csv_file(rows: List[List]):
     header = ["Make", "Model", "Generation", "Modification", "FuelType", "DriveType", "Transmission", "BodyType", "Doors"]
 
     # write header
-    with open(RESULT_CSV_FILE_NAME, 'w', newline="\n", encoding="utf-8") as file:
+    with open(RESULT_CSV_FILE_NAME, 'w', newline="\n", encoding="cp1251") as file:
         writer = csv.writer(file, delimiter=";")
         writer.writerow(header)
 
     # write rows
     for row in rows:
-        with open(RESULT_CSV_FILE_NAME, 'a', newline="\n", encoding="utf-8") as file:
+        with open(RESULT_CSV_FILE_NAME, 'a', newline="\n", encoding="cp1251") as file:
             writer = csv.writer(file, delimiter=";")
             writer.writerow(row)
 

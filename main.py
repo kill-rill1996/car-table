@@ -115,7 +115,7 @@ def get_product_types(group_M: str, sub_group_N: str) -> list:
             result.append(row_values[4])
 
     if not result:
-        return ["ЗАГЛУШКА 1", "ЗАГЛУШКА 2", "ЗАГЛУШКА 3"]
+        return ["ЗАГЛУШКА 1", "ЗАГЛУШКА 2", "ЗАГЛУШКА 3", "ЗАГЛУШКА 4", "ЗАГЛУШКА 5"]
     return result
 
 
@@ -129,15 +129,19 @@ def get_OEM_field(row: list) -> str:
     elif row[3].replace(" ", ""):
         oem = row[3]
     else:
-        unique_value = datetime.now().timestamp()
-        oem = str(int(unique_value * 1_000_000))
+        oem = get_random_OEM()
 
     if type(oem) == str:
         if "E+" in oem:
-            unique_value = datetime.now().timestamp()
-            oem = str(int(unique_value * 1_000_000))
+            oem = get_random_OEM()
 
     return oem
+
+
+def get_random_OEM() -> str:
+    """Возвращает случайное число в str формате"""
+    unique_value = datetime.now().timestamp()
+    return str(int(unique_value * 1_000_000))
 
 
 # TODO
