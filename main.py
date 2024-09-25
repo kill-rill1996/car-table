@@ -23,7 +23,7 @@ def open_1c_file(filename: str):
                 count += 1
                 continue
 
-            if count > 1000:
+            if count > 100:
                 return
 
             print(f"Обрабатывается строка № {count}")
@@ -40,7 +40,8 @@ def open_1c_file(filename: str):
 
             count += 1
 
-        wirte_error_rows(skip_row_count, skipped_rows)
+        # запись пропущенных строк с ошибками в errors.txt
+        write_error_rows(skip_row_count, skipped_rows)
 
 
 def get_result_row(csv_row: list) -> list:
@@ -121,9 +122,10 @@ def get_OEM_field(row: list) -> str:
         oem = unique_value
     # else:
     #     oem = row[11].replace(" ", "")
-    if "E+" in oem:
-        unique_value = datetime.now().timestamp()
-        oem = unique_value
+    if type(oem) == str:
+        if "E+" in oem:
+            unique_value = datetime.now().timestamp()
+            oem = unique_value
 
     return oem
 
@@ -131,7 +133,7 @@ def get_OEM_field(row: list) -> str:
 # TODO
 def get_description(row: list) -> str:
     """Заполняется по правилам для группы товара"""
-    return "".join(row)
+    return "".join([cell.strip() for cell in row])
 
 
 def write_to_csv_file(row: list):
@@ -156,7 +158,7 @@ def init_csv_result_file():
         writer.writerow(header)
 
 
-def wirte_error_rows(skip_row_count: int, skipped_rows: List[int]):
+def write_error_rows(skip_row_count: int, skipped_rows: List[int]):
     """Записывает необработанные строки из файла выгрузки 1С"""
     text = f"Пропущено строк: {skip_row_count}\nНомера строк:\n{[f'{row_number};' for row_number in skipped_rows]}"
     with open("errors.txt", "w") as file:
