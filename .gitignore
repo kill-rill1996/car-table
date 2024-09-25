@@ -333,4 +333,5 @@ pip-selfcheck.json
 
 *.csv
 *.xml
+errors.txt
 # End of https://www.toptal.com/developers/gitignore/api/macos,pycharm,python,venv

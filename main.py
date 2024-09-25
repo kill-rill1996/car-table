@@ -1,4 +1,6 @@
 import csv
+from typing import List
+
 from config import config
 import openpyxl
 
@@ -40,7 +42,7 @@ def open_1c_file(filename: str):
 
             count += 1
 
-        print(f"Пропущено строк: {skip_row_count}\n {[f'{row_number};' for row_number in skipped_rows]}")
+        wirte_error_rows(skip_row_count, skipped_rows)
 
 
 def get_result_row(csv_row: list) -> list:
@@ -145,6 +147,13 @@ def init_csv_result_file():
     with open(config["filename_result"], 'w', newline="\n") as file:
         writer = csv.writer(file, delimiter=";")
         writer.writerow(header)
+
+
+def wirte_error_rows(skip_row_count: int, skipped_rows: List[str]):
+    """Записывает необработанные строки из файла выгрузки 1С"""
+    text = f"Пропущено строк: {skip_row_count}\nНомера строк:\n{[f'{row_number};' for row_number in skipped_rows]}"
+    with open("errors.txt", "w") as file:
+        file.write(text)
 
 
 if __name__ == "__main__":
