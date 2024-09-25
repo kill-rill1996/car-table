@@ -1,10 +1,8 @@
 import csv
 from typing import List
-
+from datetime import datetime
 from config import config
 import openpyxl
-
-import math, decimal
 
 
 def main():
@@ -116,8 +114,17 @@ def get_OEM_field(row: list) -> str:
         oem = row[5]
     elif row[7].replace(" ", ""):
         oem = row[7]
+    elif row[3].replace(" ", ""):
+        oem = row[3]
     else:
-        oem = row[11].replace(" ", "")
+        unique_value = datetime.now().timestamp()
+        oem = unique_value
+    # else:
+    #     oem = row[11].replace(" ", "")
+    if "E+" in oem:
+        unique_value = datetime.now().timestamp()
+        oem = unique_value
+
     return oem
 
 
@@ -130,10 +137,10 @@ def get_description(row: list) -> str:
 def write_to_csv_file(row: list):
     """Записывает результат в csv файл"""
     # прод версия
-    with open(config["filename_result"], 'a', newline="\n", encoding="cp1251") as file:
+    # with open(config["filename_result"], 'a', newline="\n", encoding="cp1251") as file:
 
     # для отладки
-    # with open(config["filename_result"], 'a', newline="\n") as file:
+    with open(config["filename_result"], 'a', newline="\n") as file:
         writer = csv.writer(file, delimiter=";")
         writer.writerow(row)
 
@@ -149,7 +156,7 @@ def init_csv_result_file():
         writer.writerow(header)
 
 
-def wirte_error_rows(skip_row_count: int, skipped_rows: List[str]):
+def wirte_error_rows(skip_row_count: int, skipped_rows: List[int]):
     """Записывает необработанные строки из файла выгрузки 1С"""
     text = f"Пропущено строк: {skip_row_count}\nНомера строк:\n{[f'{row_number};' for row_number in skipped_rows]}"
     with open("errors.txt", "w") as file:
