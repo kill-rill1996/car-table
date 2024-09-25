@@ -130,13 +130,12 @@ def get_OEM_field(row: list) -> str:
         oem = row[3]
     else:
         unique_value = datetime.now().timestamp()
-        oem = unique_value
-    # else:
-    #     oem = row[11].replace(" ", "")
+        oem = str(int(unique_value * 1_000_000))
+
     if type(oem) == str:
         if "E+" in oem:
             unique_value = datetime.now().timestamp()
-            oem = unique_value
+            oem = str(int(unique_value * 1_000_000))
 
     return oem
 
