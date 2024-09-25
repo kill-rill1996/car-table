@@ -34,14 +34,8 @@ def get_all_cars_info() -> List[List]:
     result_rows = []
 
     for make in root.findall('Make'):
-        # make_name = make.get("name")
-
         for model in make.findall("Model"):
-            # model_name = model.get("name")
-
             for generation in model.findall("Generation"):
-                # generation_name = generation.get("name")
-
                 for modification in generation.findall("Modification"):
                     make_name = modification.find("Make").text
                     model_name = modification.find("Model").text
