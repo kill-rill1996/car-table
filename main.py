@@ -4,6 +4,8 @@ from typing import List
 from datetime import datetime
 from config import config
 import openpyxl
+from descriptions import get_description_general
+
 
 RANDOM_OEM = int(datetime.now().timestamp() * 1_000_000)
 
@@ -24,7 +26,7 @@ def write_result_file(filename: str) -> (int, List[int]):
     skip_row_count = 0
     skipped_rows = []
 
-    with open(filename, newline="\n", encoding="cp1251") as file:
+    with open(filename, newline="\n", encoding="utf-8") as file:
         reader = csv.reader(file.read().splitlines(), delimiter=';')
         count = 0
 
@@ -155,7 +157,9 @@ def get_random_OEM() -> str:
 # TODO
 def get_description(row: list) -> str:
     """Заполняется по правилам для группы товара"""
-    return " ".join([cell.strip() for cell in row])
+    description = get_description_general(row)
+    return description
+    # return " ".join([cell.strip() for cell in row])
 
 
 def write_to_csv_file(row: list):
