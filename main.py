@@ -6,16 +6,24 @@ import openpyxl
 
 
 def main():
+    # Создание результирующего файла с заголовком
     init_csv_result_file()
-    open_1c_file(config["filename_from_1c"])
+
+    # запись в результирующий файл, возвращение ошибок
+    errors_count, error_rows_numbers = write_result_file(config["filename_from_1c"])
+
+    # запись ошибок в errors.txt
+    write_error_rows(errors_count, error_rows_numbers)
 
 
-def open_1c_file(filename: str):
+def write_result_file(filename: str) -> (int, List[int]):
+    """Получение данных из файла выгрузки из 1С, запись в рузельтирующий файл, возвращение ошибок"""
+    skip_row_count = 0
+    skipped_rows = []
+
     with open(filename, newline="\n", encoding="cp1251") as file:
         reader = csv.reader(file.read().splitlines(), delimiter=';')
         count = 0
-        skip_row_count = 0
-        skipped_rows = []
 
         for row in reader:
             # пропуск заголовка
@@ -23,8 +31,8 @@ def open_1c_file(filename: str):
                 count += 1
                 continue
 
-            if count > 100:
-                return
+            if count > 10:
+                break
 
             print(f"Обрабатывается строка № {count}")
 
@@ -40,8 +48,7 @@ def open_1c_file(filename: str):
 
             count += 1
 
-        # запись пропущенных строк с ошибками в errors.txt
-        write_error_rows(skip_row_count, skipped_rows)
+    return skip_row_count, skipped_rows
 
 
 def get_result_row(csv_row: list) -> list:
@@ -62,6 +69,8 @@ def get_result_row(csv_row: list) -> list:
     result_row.append(product_info[0])  # ProductType
     result_row.append(product_info[1])  # SparePartType
     result_row.append(product_info[2])  # EngineSparePartType
+    result_row.append(product_info[3])  # BodySparePartType
+    result_row.append(product_info[4])  # DeviceType
 
     description = get_description(csv_row)
     result_row.append(description)  # Description
@@ -102,6 +111,8 @@ def get_product_types(group_M: str, sub_group_N: str) -> list:
             result.append(row_values[0])
             result.append(row_values[1])
             result.append(row_values[2])
+            result.append(row_values[3])
+            result.append(row_values[4])
 
     if not result:
         return ["ЗАГЛУШКА 1", "ЗАГЛУШКА 2", "ЗАГЛУШКА 3"]
@@ -133,7 +144,7 @@ def get_OEM_field(row: list) -> str:
 # TODO
 def get_description(row: list) -> str:
     """Заполняется по правилам для группы товара"""
-    return "".join([cell.strip() for cell in row])
+    return " ".join([cell.strip() for cell in row])
 
 
 def write_to_csv_file(row: list):
@@ -150,8 +161,8 @@ def write_to_csv_file(row: list):
 def init_csv_result_file():
     """Создает файл для записи результатов и устанавливает заголовок"""
     header = ["Id", "AvitoId", "ManagerName", "ContactPhone", "Address", "Category",
-              "Title", "GoodsType", "AdType", "ProductType", "SparePartType", "EngineSparePartType",
-              "Description", "Condition", "Availability", "Brand", "ImageUrls", "OEM", " ", "Make", "Model",
+              "Title", "GoodsType", "AdType", "ProductType", "SparePartType", "EngineSparePartType", "BodySparePartType",
+              "DeviceType", "Description", "Condition", "Availability", "Brand", "ImageUrls", "OEM", " ", "Make", "Model",
               "Generation", "AdStatus", "Price"]
     with open(config["filename_result"], 'w', newline="\n") as file:
         writer = csv.writer(file, delimiter=";")
@@ -160,9 +171,13 @@ def init_csv_result_file():
 
 def write_error_rows(skip_row_count: int, skipped_rows: List[int]):
     """Записывает необработанные строки из файла выгрузки 1С"""
-    text = f"Пропущено строк: {skip_row_count}\nНомера строк:\n{[f'{row_number};' for row_number in skipped_rows]}"
-    with open("errors.txt", "w") as file:
-        file.write(text)
+    if skip_row_count > 0:
+        text = f"Пропущено строк: {skip_row_count}\n\nНомера пропущенных строк в файле выгрузки из 1С:\n{' '.join([f'{row_number};' for row_number in skipped_rows])}"
+        with open("errors.txt", "w") as file:
+            file.write(text)
+        print(f"Пропущено строк: {skip_row_count}. Их номера записаны в файле errors.txt")
+    else:
+        print("Все строки записаны, ошибок нет")
 
 
 if __name__ == "__main__":
