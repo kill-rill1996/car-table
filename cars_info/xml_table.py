@@ -6,7 +6,8 @@ import xml.etree.ElementTree as ET
 
 
 URL = "http://autoload.avito.ru/format/Autocatalog.xml"
-RESULT_CSV_FILE_NAME = "all_cars.csv"
+XML_FILE_NAME = "cars.xml"
+RESULT_CSV_FILE_NAME = "cars.csv"
 
 
 def main():
@@ -19,14 +20,14 @@ def download_xml_cars_file():
     """Скачиваем XML файл"""
     print("Скачивание XML файла....")
     response = requests.get(URL)
-    with open('cars.xml', 'wb') as file:
+    with open(XML_FILE_NAME, 'wb') as file:
         file.write(response.content)
 
 
 def get_all_cars_info() -> List[List]:
     """Получаем информацию обо всех машинах из XML файла"""
     print("Получение данных из XML файла...")
-    root = ET.parse('cars.xml').getroot()
+    root = ET.parse(XML_FILE_NAME).getroot()
 
     result_rows = []
 
