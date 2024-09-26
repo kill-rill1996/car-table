@@ -4,7 +4,7 @@ from typing import List
 from datetime import datetime
 from config import config
 import openpyxl
-from descriptions import get_description_general
+from descriptions import get_description
 
 
 RANDOM_OEM = int(datetime.now().timestamp() * 1_000_000)
@@ -37,7 +37,7 @@ def write_result_file(filename: str) -> (int, List[int]):
                 continue
 
             # debug version
-            if count > 50:
+            if count > 1000:
                 break
 
             print(f"Обрабатывается строка № {count}")
@@ -152,14 +152,6 @@ def get_random_OEM() -> str:
     """Возвращает случайное число в str формате"""
     unique_value = datetime.now().timestamp()
     return str(int(unique_value * 1_000_000))
-
-
-# TODO
-def get_description(row: list) -> str:
-    """Заполняется по правилам для группы товара"""
-    description = get_description_general(row)
-    return description
-    # return " ".join([cell.strip() for cell in row])
 
 
 def write_to_csv_file(row: list):
