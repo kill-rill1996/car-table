@@ -26,7 +26,7 @@ def write_result_file(filename: str) -> (int, List[int]):
     skip_row_count = 0
     skipped_rows = []
 
-    with open(filename, newline="\n", encoding="utf-8") as file:
+    with open(filename, newline="\n", encoding="cp1251") as file:
         reader = csv.reader(file.read().splitlines(), delimiter=';')
         count = 0
 
