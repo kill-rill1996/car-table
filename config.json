@@ -10,5 +10,6 @@
   "availability": "В наличии",
   "ad_status": "Free",
   "version": "macos",
-  "result_encoding": "utf-8"
+  "result_encoding": "utf-8",
+  "1C_file_encoding": "cp1251"
 }
