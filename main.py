@@ -26,7 +26,7 @@ def write_result_file(filename: str) -> (int, List[int]):
     skip_row_count = 0
     skipped_rows = []
 
-    with open(filename, newline="\n", encoding="utf-8") as file:
+    with open(filename, newline="\n", encoding="cp1251") as file:
         reader = csv.reader(file.read().splitlines(), delimiter=';')
         count = 0
 
@@ -37,7 +37,7 @@ def write_result_file(filename: str) -> (int, List[int]):
                 continue
 
             # debug version
-            if count > 1000:
+            if count > 10:
                 break
 
             print(f"Обрабатывается строка № {count}")
@@ -65,13 +65,26 @@ def get_result_row(csv_row: list) -> list:
 
     result_row.append(csv_row[4])   # Id
     result_row.append("")   # AvitoId
-    result_row.append(config["manager_name"])   # ManagerName
-    result_row.append(config["contact_phone"])   # ContactPhone
-    result_row.append(config["address"])   # Address
-    result_row.append(config["category"])   # Category
+
+    if config["version"] == "windows":
+        result_row.append(config["manager_name"].encode("cp1251").decode("utf-8"))  # ManagerName
+        result_row.append(config["contact_phone"].encode("cp1251").decode("utf-8"))  # ContactPhone
+        result_row.append(config["address"].encode("cp1251").decode("utf-8"))  # Address
+        result_row.append(config["category"].encode("cp1251").decode("utf-8"))  # Category
+    else:
+        result_row.append(config["manager_name"])  # ManagerName
+        result_row.append(config["contact_phone"])  # ContactPhone
+        result_row.append(config["address"])  # Address
+        result_row.append(config["category"])  # Category
+
     result_row.append(csv_row[2])   # Title
-    result_row.append(config["goods_type"])  # GoodsType
-    result_row.append(config["ad_type"])  # AdType
+
+    if config["version"] == "windows":
+        result_row.append(config["goods_type"].encode("cp1251").decode("utf-8"))  # GoodsType
+        result_row.append(config["ad_type"].encode("cp1251").decode("utf-8"))  # AdType
+    else:
+        result_row.append(config["goods_type"])  # GoodsType
+        result_row.append(config["ad_type"])  # AdType
 
     product_info = get_product_types(csv_row[12], csv_row[13])
     result_row.append(product_info[0])  # ProductType
@@ -84,7 +97,11 @@ def get_result_row(csv_row: list) -> list:
     result_row.append(description)  # Description
 
     result_row.append(csv_row[1])  # Condition
-    result_row.append(config["availability"])  # Availability
+
+    if config["version"] == "windows":
+        result_row.append(config["availability"].encode("cp1251").decode("utf-8"))  # Availability
+    else:
+        result_row.append(config["availability"])  # Availability
 
     result_row.append(csv_row[15])  # Brand
     result_row.append(csv_row[33])  # ImageUrls
@@ -97,7 +114,11 @@ def get_result_row(csv_row: list) -> list:
     result_row.append("Model")  # Model строка TODO
     result_row.append("Generation")  # Generation строка TODO
 
-    result_row.append(config["ad_status"])   # AdStatus
+    if config["version"] == "windows":
+        result_row.append(config["ad_status"])   # AdStatus
+    else:
+        result_row.append(config["ad_status"])  # AdStatus
+
     result_row.append(csv_row[14])   # Price
 
     return result_row
@@ -156,11 +177,7 @@ def get_random_OEM() -> str:
 
 def write_to_csv_file(row: list):
     """Записывает результат в csv файл"""
-    # прод версия
-    # with open(config["filename_result"], 'a', newline="\n", encoding="cp1251") as file:
-
-    # для отладки
-    with open(config["filename_result"], 'a', newline="\n") as file:
+    with open(config["filename_result"], 'a', newline="\n", encoding=config["result_encoding"]) as file:
         writer = csv.writer(file, delimiter=";")
         writer.writerow(row)
 
@@ -171,7 +188,7 @@ def init_csv_result_file():
               "Title", "GoodsType", "AdType", "ProductType", "SparePartType", "EngineSparePartType", "BodySparePartType",
               "DeviceType", "Description", "Condition", "Availability", "Brand", "ImageUrls", "OEM", " ", "Make", "Model",
               "Generation", "AdStatus", "Price"]
-    with open(config["filename_result"], 'w', newline="\n") as file:
+    with open(config["filename_result"], 'w', newline="\n", encoding="cp1251") as file:
         writer = csv.writer(file, delimiter=";")
         writer.writerow(header)
 
