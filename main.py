@@ -193,12 +193,17 @@ def init_csv_result_file():
 
 def write_error_rows(skip_row_count: int, skipped_rows: List[int]):
     """Записывает необработанные строки из файла выгрузки 1С"""
+    with open("errors.txt", "w") as file:
+        file.write("Список ошибок:\n\n")
+
     if skip_row_count > 0:
         text = f"Пропущено строк: {skip_row_count}\n\nНомера пропущенных строк в файле выгрузки из 1С:\n{' '.join([f'{row_number};' for row_number in skipped_rows])}"
-        with open("errors.txt", "w") as file:
+        with open("errors.txt", "a") as file:
             file.write(text)
         print(f"Пропущено строк: {skip_row_count}. Их номера записаны в файле errors.txt")
     else:
+        with open("errors.txt", "a") as file:
+            file.write("Все строки записаны, ошибок нет")
         print("Все строки записаны, ошибок нет")
 
 
