@@ -162,10 +162,6 @@ def get_OEM_field(row: list) -> str:
         oem = str(RANDOM_OEM)
         RANDOM_OEM += 1
 
-    # if type(oem) == str:
-    #     if "E+" in oem:
-    #         oem = get_random_OEM()
-
     return oem
 
 
