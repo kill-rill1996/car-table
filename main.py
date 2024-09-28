@@ -5,9 +5,7 @@ from datetime import datetime
 from config import config
 import openpyxl
 from descriptions import get_description
-
-
-RANDOM_OEM = int(datetime.now().timestamp() * 1_000_000)
+from get_from_xlsx_files import get_product_type_from_xlsx_file, get_make_model_generation_from_xlsx_file
 
 
 def main():
@@ -106,13 +104,21 @@ def get_result_row(csv_row: list) -> list:
     result_row.append(csv_row[15])  # Brand
     result_row.append(csv_row[33])  # ImageUrls
 
-    oem_filed = get_OEM_field(csv_row)
+    oem_filed = get_oem_field(csv_row)
     result_row.append(oem_filed)    # OEM
 
-    result_row.append("ПУСТАЯ СТРОКА")  # S пустая строка TODO убрать
-    result_row.append("Make")  # Make строка TODO
-    result_row.append("Model")  # Model строка TODO
-    result_row.append("Generation")  # Generation строка TODO
+    # result_row.append("ПУСТАЯ СТРОКА")  # S пустая строка TODO убрать
+
+    make_model_generation = get_make_model_generation(csv_row[15], csv_row[16], csv_row[17])
+    result_row.append(make_model_generation[0])  # Make строка
+    result_row.append(make_model_generation[1])  # Model строка
+    result_row.append(make_model_generation[2])  # Generation строка
+    result_row.append(make_model_generation[3])  # Modification строка
+    result_row.append(make_model_generation[4])  # FuelType строка
+    result_row.append(make_model_generation[5])  # DriveType строка
+    result_row.append(make_model_generation[6])  # Transmission строка
+    result_row.append(make_model_generation[7])  # BodyType строка
+    result_row.append(make_model_generation[8])  # Doors строка
 
     if config["version"] == "windows":
         result_row.append(config["ad_status"])   # AdStatus
@@ -126,22 +132,14 @@ def get_result_row(csv_row: list) -> list:
 
 def get_product_types(group_M: str, sub_group_N: str) -> list:
     """Сопоставляем М (12), N (13) с G в таблице соответствия и полями B(1), C(2), D(3) заполняет поля J, K, L"""
-    file = openpyxl.load_workbook("compare_table.xlsx")
-    sheet_obj = file.active
-    values_area = sheet_obj["B3":"H339"]
     result = []
-
-    for row in values_area:
-        row_values = []
-        for cell in row:
-            row_values.append(cell.value)
-
-        if row_values[5] == group_M and row_values[6] == sub_group_N:
-            result.append(row_values[0])
-            result.append(row_values[1])
-            result.append(row_values[2])
-            result.append(row_values[3])
-            result.append(row_values[4])
+    for row in PRODUCT_TYPES:
+        if row[5] == group_M and row[6] == sub_group_N:
+            result.append(row[0])
+            result.append(row[1])
+            result.append(row[2])
+            result.append(row[3])
+            result.append(row[4])
 
     if not result:
         return ["ЗАГЛУШКА 1", "ЗАГЛУШКА 2", "ЗАГЛУШКА 3", "ЗАГЛУШКА 4", "ЗАГЛУШКА 5"]
@@ -149,7 +147,7 @@ def get_product_types(group_M: str, sub_group_N: str) -> list:
 
 
 # TODO разобраться с пробелами
-def get_OEM_field(row: list) -> str:
+def get_oem_field(row: list) -> str:
     """Получает ОЕМ из 1С колонка F or H or L или случайное число"""
     if row[5].replace(" ", ""):
         oem = row[5]
@@ -165,10 +163,14 @@ def get_OEM_field(row: list) -> str:
     return oem
 
 
-def get_random_OEM() -> str:
-    """Возвращает случайное число в str формате"""
-    unique_value = datetime.now().timestamp()
-    return str(int(unique_value * 1_000_000))
+def get_make_model_generation(make: str, model: str, generation: str) -> list:
+    """Получение Make Model Generation Modification FuelType DriveType Transmission
+    BodyType Doors по P Q R из 1С файла"""
+    for row in MAKES_MODELS_GENERATIONS:
+        if row[10] == make and row[11] == model and row[12] == generation:
+            return row
+
+    return ["ЗАГЛУШКА 1", "ЗАГЛУШКА 2", "ЗАГЛУШКА 3", "ЗАГЛУШКА 4", "ЗАГЛУШКА 5", "ЗАГЛУШКА 6", "ЗАГЛУШКА 7", "ЗАГЛУШКА 8", "ЗАГЛУШКА 9"]
 
 
 def write_to_csv_file(row: list):
@@ -182,8 +184,8 @@ def init_csv_result_file():
     """Создает файл для записи результатов и устанавливает заголовок"""
     header = ["Id", "AvitoId", "ManagerName", "ContactPhone", "Address", "Category",
               "Title", "GoodsType", "AdType", "ProductType", "SparePartType", "EngineSparePartType", "BodySparePartType",
-              "DeviceType", "Description", "Condition", "Availability", "Brand", "ImageUrls", "OEM", " ", "Make", "Model",
-              "Generation", "AdStatus", "Price"]
+              "DeviceType", "Description", "Condition", "Availability", "Brand", "ImageUrls", "OEM", "Make", "Model",
+              "Generation", "Modification", "FuelType", "DriveType", "Transmission", "BodyType", "Doors", "AdStatus", "Price"]
     with open(config["filename_result"], 'w', newline="\n", encoding="cp1251") as file:
         writer = csv.writer(file, delimiter=";")
         writer.writerow(header)
@@ -201,6 +203,10 @@ def write_error_rows(skip_row_count: int, skipped_rows: List[int]):
 
 
 if __name__ == "__main__":
+    PRODUCT_TYPES = get_product_type_from_xlsx_file()
+    MAKES_MODELS_GENERATIONS = get_make_model_generation_from_xlsx_file()
+    RANDOM_OEM = int(datetime.now().timestamp() * 1_000_000)
+
     start = datetime.now()
     main()
     end = datetime.now()

@@ -338,4 +338,5 @@ errors.txt
 *.idea/
 /.idea
 .idea/misc.xml
+*xlsx
 # End of https://www.toptal.com/developers/gitignore/api/macos,pycharm,python,venv
