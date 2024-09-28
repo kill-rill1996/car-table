@@ -1,5 +1,4 @@
 import csv
-from datetime import datetime
 
 from config import get_config
 from descriptions import get_description
@@ -13,8 +12,8 @@ class AvitoTable:
         self.errors: dict[int:list] = {}
         self.config: dict = get_config()
         self.skip_rows_count: int = 0
-        self.PRODUCT_TYPES = get_product_type_from_xlsx_file()
-        self.MAKES_MODELS_GENERATIONS: list[list] = get_make_model_generation_from_xlsx_file()
+        self.PRODUCT_TYPES = get_product_type_from_xlsx_file(self.config["compare_table_groups"])
+        self.MAKES_MODELS_GENERATIONS: list[list] = get_make_model_generation_from_xlsx_file(self.config["compare_table_cars"])
         self.RANDOM_OEM = 10000210011
 
     def make_avito_table(self):
@@ -44,7 +43,7 @@ class AvitoTable:
                     continue
 
                 # debug version
-                # if self.row_count > 1000:
+                # if self.row_count > 10:
                 #     break
 
                 print(f"Обрабатывается строка № {self.row_count}")

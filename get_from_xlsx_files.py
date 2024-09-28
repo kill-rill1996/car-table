@@ -1,10 +1,10 @@
 import openpyxl
 
 
-def get_make_model_generation_from_xlsx_file() -> list:
+def get_make_model_generation_from_xlsx_file(filename: str) -> list:
     """Получение всех Make Model Generation Modification FuelType DriveType Transmission
     BodyType Doors из второй сравнительной таблицы"""
-    file = openpyxl.load_workbook("compare_table_cars.xlsx")
+    file = openpyxl.load_workbook(filename)
     sheet_obj = file.active
     values_area = sheet_obj["A2":"M21370"]
     result = []
@@ -19,9 +19,9 @@ def get_make_model_generation_from_xlsx_file() -> list:
     return result
 
 
-def get_product_type_from_xlsx_file() -> list:
+def get_product_type_from_xlsx_file(filename: str) -> list:
     """Получение всех ProductType из первой сравнительной таблицы"""
-    file = openpyxl.load_workbook("compare_table_groups.xlsx")
+    file = openpyxl.load_workbook(filename)
     sheet_obj = file.active
     values_area = sheet_obj["B3":"H339"]
     result = []
