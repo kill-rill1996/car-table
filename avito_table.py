@@ -164,7 +164,7 @@ class AvitoTable:
         self._add_error(f"Не удалось найти соответствие ProductType, SparePartType, EngineSparePartType, "
                         f"BodySparePartType, DeviceType по группе '{group_m}' и подгруппе '{sub_group_n}'")
 
-        return ["ЗАГЛУШКА 1", "ЗАГЛУШКА 2", "ЗАГЛУШКА 3", "ЗАГЛУШКА 4", "ЗАГЛУШКА 5"]
+        return ["", "", "", "", ""]
 
     def _get_oem_field(self, row: list) -> str:
         """Получает ОЕМ из 1С колонка F or H or L или случайное число"""
