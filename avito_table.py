@@ -125,18 +125,16 @@ class AvitoTable:
         oem_filed = self._get_oem_field(csv_row)
         result_row.append(oem_filed)  # OEM
 
-        # result_row.append("ПУСТАЯ СТРОКА")  # S пустая строка TODO
-
         make_model_generation = self._get_make_model_generation(csv_row[15], csv_row[16], csv_row[17])
         result_row.append(make_model_generation[0])  # Make строка
         result_row.append(make_model_generation[1])  # Model строка
         result_row.append(make_model_generation[2])  # Generation строка
-        result_row.append(make_model_generation[3])  # Modification строка
-        result_row.append(make_model_generation[4])  # FuelType строка
-        result_row.append(make_model_generation[5])  # DriveType строка
-        result_row.append(make_model_generation[6])  # Transmission строка
-        result_row.append(make_model_generation[7])  # BodyType строка
-        result_row.append(make_model_generation[8])  # Doors строка
+        # result_row.append(make_model_generation[3])  # Modification строка
+        # result_row.append(make_model_generation[4])  # FuelType строка
+        # result_row.append(make_model_generation[5])  # DriveType строка
+        # result_row.append(make_model_generation[6])  # Transmission строка
+        # result_row.append(make_model_generation[7])  # BodyType строка
+        # result_row.append(make_model_generation[8])  # Doors строка
 
         if self.config["version"] == "windows":
             result_row.append(self.config["ad_status"])  # AdStatus
@@ -144,6 +142,9 @@ class AvitoTable:
             result_row.append(self.config["ad_status"])  # AdStatus
 
         result_row.append(csv_row[14])  # Price
+
+        if not self._check_correct_brand(csv_row):
+            result_row[17] = result_row[20]
 
         return result_row
 
@@ -187,10 +188,14 @@ class AvitoTable:
                     and row[12] == modification:
                 return row
 
-        self._add_error(f"Не удалось найти соответствие Make, Model, Generation, Modification, FuelType, DriveType, "
-                        f"Transmission, BodyType, Doors по марке '{make}', модели '{model}' и модификации '{modification}'")
-        return ["ЗАГЛУШКА 1", "ЗАГЛУШКА 2", "ЗАГЛУШКА 3", "ЗАГЛУШКА 4", "ЗАГЛУШКА 5", "ЗАГЛУШКА 6", "ЗАГЛУШКА 7",
-                "ЗАГЛУШКА 8", "ЗАГЛУШКА 9"]
+        self._add_error(f"Не удалось найти соответствие Make, Model, Generation по марке '{make}', модели '{model}' и модификации '{modification}'")
+        return ["", "", ""]
+
+    def _check_correct_brand(self, csv_row: list) -> bool:
+        """Меняет поле Brand в результирующей таблице, если в таблице 1C поле марка(P)=ALL и поле B=Б/у"""
+        if csv_row[1] == "Б/у" and csv_row[15] == "ALL":
+            return False
+        return True
 
     def write_to_csv_file(self, row: list):
         """Записывает результат в csv файл"""
@@ -202,11 +207,8 @@ class AvitoTable:
         """Создает файл для записи результатов и устанавливает заголовок"""
         header = ["Id", "AvitoId", "ManagerName", "ContactPhone", "Address", "Category",
                   "Title", "GoodsType", "AdType", "ProductType", "SparePartType", "EngineSparePartType",
-                  "BodySparePartType",
-                  "DeviceType", "Description", "Condition", "Availability", "Brand", "ImageUrls", "OEM", "Make",
-                  "Model",
-                  "Generation", "Modification", "FuelType", "DriveType", "Transmission", "BodyType", "Doors",
-                  "AdStatus", "Price"]
+                  "BodySparePartType", "DeviceType", "Description", "Condition", "Availability", "Brand", "ImageUrls",
+                  "OEM", "Make", "Model", "Generation", "AdStatus", "Price"]
         with open(self.config["filename_result"], 'w', newline="\n", encoding=self.config["result_encoding"]) as file:
             writer = csv.writer(file, delimiter=";")
             writer.writerow(header)
@@ -232,3 +234,4 @@ class AvitoTable:
             with open("errors.txt", "a") as file:
                 file.write("Все строки записаны, ошибок нет")
             print("Все строки записаны, ошибок нет")
+
