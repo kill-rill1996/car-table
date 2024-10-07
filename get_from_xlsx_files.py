@@ -6,7 +6,7 @@ def get_make_model_generation_from_xlsx_file(filename: str) -> list:
     BodyType Doors из второй сравнительной таблицы"""
     file = openpyxl.load_workbook(filename)
     sheet_obj = file.active
-    values_area = sheet_obj["A2":"M21370"]
+    values_area = sheet_obj["A2":"M100000"]
     result = []
 
     for row in values_area:
