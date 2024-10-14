@@ -184,8 +184,8 @@ class AvitoTable:
         BodyType Doors по P Q R из 1С файла"""
 
         for row in self.MAKES_MODELS_GENERATIONS:
-            if row[10] == make and row[11] == model \
-                    and row[12] == modification:
+            if str(row[10]) == str(make) and str(row[11]) == str(model) \
+                    and str(row[12]) == str(modification):
                 return row
 
         self._add_error(f"Не удалось найти соответствие Make, Model, Generation по марке '{make}', модели '{model}' и модификации '{modification}'")
