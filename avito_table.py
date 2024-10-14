@@ -43,8 +43,8 @@ class AvitoTable:
                     continue
 
                 # debug version
-                if self.row_count > 1000:
-                    break
+                # if self.row_count > 1000:
+                #     break
 
                 print(f"Обрабатывается строка № {self.row_count}")
 
