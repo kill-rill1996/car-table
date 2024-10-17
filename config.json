@@ -6,12 +6,13 @@
   "manager_name": "София",
   "contact_phone": "8 918 455 29 03",
   "address": "Краснодарский край, г.Краснодар, ул.Фадеева, 215",
+  "commission": 7,
   "category": "Запчасти и аксессуары",
   "goods_type": "Запчасти",
   "ad_type": "Товар приобретен на продажу",
   "availability": "В наличии",
   "ad_status": "Free",
-  "version": "windows",
-  "result_encoding": "cp1251",
+  "version": "macos",
+  "result_encoding": "utf-8",
   "1C_file_encoding": "cp1251"
 }

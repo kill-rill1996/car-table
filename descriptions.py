@@ -109,7 +109,7 @@ def get_description_rule_1(row: List, rule1_1: bool = None) -> str:
     cell_d = f"Крос номер {row[3].strip()}" + " " if row[3].strip() else ""
     cell_ac = f"Состояние {row[28].strip()}" + " " if row[28].strip() else ""
     cell_g = f"На детали указано {row[6].strip()}" + " " if row[6].strip() else ""
-    cell_e = f"код {row[4].strip()}" + " " if row[4].strip() else ""
+    cell_e = f"(код {row[4].strip()})" + " " if row[4].strip() else ""
 
     if rule1_1:
         text = f"{cell_c}{cell_b}{cell_v}{cell_w}{cell_x}{cell_u}{cell_j}{cell_p}{cell_q}{cell_r}{cell_ae}" \
@@ -161,7 +161,7 @@ def get_description_rule_2(row: List, rule2_1: bool = None) -> str:
     cell_ac = f"Состояние {row[28].strip()}" + " " if row[28].strip() else ""
     cell_g = f"На детали указано {row[6].strip()}" + " " if row[6].strip() else ""
     cell_i = f"цена указана за {row[8].strip()}" + " " if row[8].strip() else ""
-    cell_e = f"код {row[4].strip()}" + " " if row[4].strip() else ""
+    cell_e = f"(код {row[4].strip()})" + " " if row[4].strip() else ""
 
     if rule2_1:
         text = f"{cell_c}{cell_b}{cell_z}{cell_aa}{cell_ab}{cell_j}{cell_p}{cell_q}{cell_r}{cell_ae}{cell_h}{cell_f}{cell_d}" \
@@ -216,7 +216,7 @@ def get_description_rule_3(row: List, rule3_2: bool = None, rule3_3: bool = None
     cell_d = f"Крос номер {row[3].strip()}" + " " if row[3].strip() else ""
     cell_ac = f"Состояние {row[28].strip()}" + " " if row[28].strip() else ""
     cell_g = f"На детали указано {row[6].strip()}" + " " if row[6].strip() else ""
-    cell_e = f"код {row[4].strip()}" + " " if row[4].strip() else ""
+    cell_e = f"(код {row[4].strip()})" + " " if row[4].strip() else ""
 
     if rule3_2:
         text = f"{cell_c}{cell_b}{cell_v}{cell_w}{cell_x}{cell_u}{cell_z}{cell_aa}{cell_ab}{cell_j}{cell_p}{cell_q}{cell_r}" \

@@ -2,8 +2,6 @@ import json
 import sys
 import os
 
-# os.chdir(sys._MEIPASS)
-
 
 def get_config():
     try:

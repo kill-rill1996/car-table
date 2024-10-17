@@ -1,4 +1,5 @@
 import csv
+import math
 
 from config import get_config
 from descriptions import get_description
@@ -141,7 +142,8 @@ class AvitoTable:
         else:
             result_row.append(self.config["ad_status"])  # AdStatus
 
-        result_row.append(csv_row[14])  # Price
+        rounded_price = self._get_round_price_with_commission(int(csv_row[14]))
+        result_row.append(rounded_price)  # Price
 
         if not self._check_correct_brand(csv_row):
             result_row[17] = result_row[20]
@@ -235,3 +237,26 @@ class AvitoTable:
                 file.write("Все строки записаны, ошибок нет")
             print("Все строки записаны, ошибок нет")
 
+    @staticmethod
+    def round_to_up(number: int) -> int:
+        """Округляет вверх до ста"""
+        return int(math.ceil(number / 100.0)) * 100
+
+    @staticmethod
+    def round_to_down(number: int) -> int:
+        """Округляет всегда вверх до ста"""
+        return int(math.floor(number / 100.0)) * 100
+    @staticmethod
+    def round_to_100(number: int) -> int:
+        """Округляет число до 100"""
+        if number <= 100:
+            return 100
+        if number % 100 > 50:
+            return AvitoTable.round_to_up(number)
+        else:
+            return AvitoTable.round_to_down(number)
+
+    def _get_round_price_with_commission(self, number: int) -> int:
+        """Округляет число до 100"""
+        price_with_commission = number * (1 + self.config["commission"] / 100)
+        return AvitoTable.round_to_100(price_with_commission)
