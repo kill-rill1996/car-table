@@ -2,7 +2,6 @@
   "compare_table_cars": "compare_table_cars.xlsx",
   "compare_table_groups": "compare_table_groups.xlsx",
   "filename_from_1c": "all_list.csv",
-  "filename_result": "result.csv",
   "manager_name": "София",
   "contact_phone": "8 918 455 29 03",
   "address": "Краснодарский край, г.Краснодар, ул.Фадеева, 215",
@@ -12,7 +11,12 @@
   "ad_type": "Товар приобретен на продажу",
   "availability": "В наличии",
   "ad_status": "Free",
+  "1C_file_encoding": "cp1251",
+  "max_rows": -1,
   "version": "windows",
-  "result_encoding": "cp1251",
-  "1C_file_encoding": "cp1251"
+  "result_encoding_upload": "utf-8",
+  "result_encoding_upload_filename": "result_avito.csv",
+  "result_encoding_local": "cp1251",
+  "result_encoding_local_filename": "result_local.csv",
+  "need_upload_file": true
 }

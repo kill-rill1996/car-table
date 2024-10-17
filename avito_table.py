@@ -21,6 +21,11 @@ class AvitoTable:
         """Создает готовый файл csv с требованиями Avito"""
         # инициализирует файл
         print("\nИнициализация csv файла...")
+
+        if self.config["need_upload_file"]:
+            # файл для отправки
+            self.init_csv_result_file(to_upload=True)
+        # файл для чтения
         self.init_csv_result_file()
 
         # записывает в файл готовые строки
@@ -44,8 +49,9 @@ class AvitoTable:
                     continue
 
                 # debug version
-                # if self.row_count > 1000:
-                #     break
+                if self.config["max_rows"] != -1:
+                    if self.row_count > self.config["max_rows"]:
+                        break
 
                 print(f"Обрабатывается строка № {self.row_count}")
 
@@ -58,7 +64,12 @@ class AvitoTable:
                 # получаем готовую строку для записи
                 result_row = self._get_result_row(row)
 
+                # запись для чтения
                 self.write_to_csv_file(result_row)
+
+                if self.config["need_upload_file"]:
+                    # запись для отправки
+                    self.write_to_csv_file(result_row, to_upload=True)
 
     def _is_row_valid(self, row: list) -> bool:
         """Проверяет валидность строки по длине и первому значению"""
@@ -142,7 +153,7 @@ class AvitoTable:
         else:
             result_row.append(self.config["ad_status"])  # AdStatus
 
-        rounded_price = self._get_round_price_with_commission(int(csv_row[14]))
+        rounded_price = self._get_price(csv_row[14])
         result_row.append(rounded_price)  # Price
 
         if not self._check_correct_brand(csv_row):
@@ -193,25 +204,41 @@ class AvitoTable:
         self._add_error(f"Не удалось найти соответствие Make, Model, Generation по марке '{make}', модели '{model}' и модификации '{modification}'")
         return ["", "", ""]
 
-    def _check_correct_brand(self, csv_row: list) -> bool:
+    @staticmethod
+    def _check_correct_brand(csv_row: list) -> bool:
         """Меняет поле Brand в результирующей таблице, если в таблице 1C поле марка(P)=ALL и поле B=Б/у"""
         if csv_row[1] == "Б/у" and csv_row[15] == "ALL":
             return False
         return True
 
-    def write_to_csv_file(self, row: list):
+    def write_to_csv_file(self, row: list, to_upload: bool = False):
         """Записывает результат в csv файл"""
-        with open(self.config["filename_result"], 'a', newline="\n", encoding=self.config["result_encoding"]) as file:
+        if to_upload:
+            result_encoding = self.config["result_encoding_upload"]
+            filename = self.config["result_encoding_upload_filename"]
+        else:
+            result_encoding = self.config["result_encoding_local"]
+            filename = self.config["result_encoding_local_filename"]
+
+        with open(filename, 'a', newline="\n", encoding=result_encoding) as file:
             writer = csv.writer(file, delimiter=";")
             writer.writerow(row)
 
-    def init_csv_result_file(self):
+    def init_csv_result_file(self, to_upload: bool = False):
         """Создает файл для записи результатов и устанавливает заголовок"""
         header = ["Id", "AvitoId", "ManagerName", "ContactPhone", "Address", "Category",
                   "Title", "GoodsType", "AdType", "ProductType", "SparePartType", "EngineSparePartType",
                   "BodySparePartType", "DeviceType", "Description", "Condition", "Availability", "Brand", "ImageUrls",
                   "OEM", "Make", "Model", "Generation", "AdStatus", "Price"]
-        with open(self.config["filename_result"], 'w', newline="\n", encoding=self.config["result_encoding"]) as file:
+
+        if to_upload:
+            result_encoding = self.config["result_encoding_upload"]
+            filename = self.config["result_encoding_upload_filename"]
+        else:
+            result_encoding = self.config["result_encoding_local"]
+            filename = self.config["result_encoding_local_filename"]
+
+        with open(filename, 'w', newline="\n", encoding=result_encoding) as file:
             writer = csv.writer(file, delimiter=";")
             writer.writerow(header)
 
@@ -236,6 +263,21 @@ class AvitoTable:
             with open("errors.txt", "a") as file:
                 file.write("Все строки записаны, ошибок нет")
             print("Все строки записаны, ошибок нет")
+
+    def _get_price(self, price: int | str) -> int | None:
+        """Получение цены"""
+        try:
+            int_price = int(price)
+        except ValueError:
+
+            try:
+                int_price = int(price.split(",")[0])
+            except ValueError:
+                self._add_error(f"Некорректная цена: \"{price}\"")
+                return
+            return self._get_round_price_with_commission(int_price)
+
+        return self._get_round_price_with_commission(int_price)
 
     @staticmethod
     def round_to_up(number: int) -> int:
