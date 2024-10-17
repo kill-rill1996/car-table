@@ -1,9 +1,27 @@
 import csv
 import math
+from datetime import datetime
+from functools import wraps
+from typing import Callable
 
 from config import get_config
 from descriptions import get_description
 from get_from_xlsx_files import get_product_type_from_xlsx_file, get_make_model_generation_from_xlsx_file
+
+
+def process_time(func: Callable):
+    """Измерение времени выполнения программы"""
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        start = datetime.now()
+
+        func(*args, **kwargs)
+
+        end = datetime.now()
+        work_time = end - start
+        print(f"\nВремя выполнения программы {work_time}")
+
+    return wrapper
 
 
 class AvitoTable:
@@ -17,6 +35,7 @@ class AvitoTable:
         self.MAKES_MODELS_GENERATIONS: list[list] = get_make_model_generation_from_xlsx_file(self.config["compare_table_cars"])
         self.RANDOM_OEM = 10000210011
 
+    @process_time
     def make_avito_table(self):
         """Создает готовый файл csv с требованиями Avito"""
         # инициализирует файл
