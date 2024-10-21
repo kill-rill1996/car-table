@@ -35,6 +35,7 @@ class AvitoTable:
         self.MAKES_MODELS_GENERATIONS: list[list] = get_make_model_generation_from_xlsx_file(self.config["compare_table_cars"])
         self.RANDOM_OEM = 10000210011
 
+
     @process_time
     def make_avito_table(self):
         """Создает готовый файл csv с требованиями Avito"""
@@ -55,40 +56,45 @@ class AvitoTable:
         print("\nФормирование файла ошибок...")
         self.write_error_rows()
 
+    def _generator(self, file):
+        with open(file, newline="\n", encoding=self.config["1C_file_encoding"]) as f:
+            reader = csv.reader(f.read().splitlines(), delimiter=';')
+            for row in reader:
+                yield row
+
     def write_result_csv_file(self):
         """Получение данных из файла выгрузки из 1С, запись в результирующий файл, возвращение ошибок"""
 
-        with open(self.config["filename_from_1c"], newline="\n", encoding=self.config["1C_file_encoding"]) as file:
-            reader = csv.reader(file.read().splitlines(), delimiter=';')
+        generator = self._generator(self.config["filename_from_1c"])
 
-            for row in reader:
-                # пропуск заголовка
-                if self.row_count == 0:
-                    self.row_count += 1
-                    continue
-
-                # debug version
-                if self.config["max_rows"] != -1:
-                    if self.row_count > self.config["max_rows"]:
-                        break
-
-                print(f"Обрабатывается строка № {self.row_count}")
-
-                # пропускаем неполные и пустые строки
-                if not self._is_row_valid(row):
-                    continue
-
+        for row in generator:
+            # пропуск заголовка
+            if self.row_count == 0:
                 self.row_count += 1
+                continue
 
-                # получаем готовую строку для записи
-                result_row = self._get_result_row(row)
+            # debug version
+            if self.config["max_rows"] != -1:
+                if self.row_count > self.config["max_rows"]:
+                    break
 
-                # запись для чтения
-                self.write_to_csv_file(result_row)
+            print(f"Обрабатывается строка № {self.row_count}")
 
-                if self.config["need_upload_file"]:
-                    # запись для отправки
-                    self.write_to_csv_file(result_row, to_upload=True)
+            # пропускаем неполные и пустые строки
+            if not self._is_row_valid(row):
+                continue
+
+            self.row_count += 1
+
+            # получаем готовую строку для записи
+            result_row = self._get_result_row(row)
+
+            # запись для чтения
+            self.write_to_csv_file(result_row)
+
+            if self.config["need_upload_file"]:
+                # запись для отправки
+                self.write_to_csv_file(result_row, to_upload=True)
 
     def _is_row_valid(self, row: list) -> bool:
         """Проверяет валидность строки по длине и первому значению"""
