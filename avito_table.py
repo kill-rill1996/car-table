@@ -35,7 +35,6 @@ class AvitoTable:
         self.MAKES_MODELS_GENERATIONS: list[list] = get_make_model_generation_from_xlsx_file(self.config["compare_table_cars"])
         self.RANDOM_OEM = 10000210011
 
-
     @process_time
     def make_avito_table(self):
         """Создает готовый файл csv с требованиями Avito"""
@@ -181,6 +180,8 @@ class AvitoTable:
         rounded_price = self._get_price(csv_row[14])
         result_row.append(rounded_price)  # Price
 
+        result_row.append(product_info[5])  # TransmissionSparePartType
+
         if not self._check_correct_brand(csv_row):
             result_row[17] = result_row[20]
 
@@ -190,19 +191,21 @@ class AvitoTable:
         """Сопоставляем М (12), N (13) с G в таблице соответствия и полями B(1), C(2), D(3) заполняет поля J, K, L"""
         result = []
         for row in self.PRODUCT_TYPES:
-            if row[5] == group_m and row[6] == sub_group_n:
+            if row[6] == group_m and row[7] == sub_group_n:
                 result.append(row[0])
                 result.append(row[1])
                 result.append(row[2])
                 result.append(row[3])
                 result.append(row[4])
+                result.append(row[5])
 
                 return result
 
         self._add_error(f"Не удалось найти соответствие ProductType, SparePartType, EngineSparePartType, "
-                        f"BodySparePartType, DeviceType по группе '{group_m}' и подгруппе '{sub_group_n}'")
+                        f"BodySparePartType, DeviceType, TransmissionSparePartType по группе '{group_m}' "
+                        f"и подгруппе '{sub_group_n}'")
 
-        return ["", "", "", "", ""]
+        return ["", "", "", "", "", ""]
 
     def _get_oem_field(self, row: list) -> str:
         """Получает ОЕМ из 1С колонка F or H or L или случайное число"""
@@ -254,7 +257,7 @@ class AvitoTable:
         header = ["Id", "AvitoId", "ManagerName", "ContactPhone", "Address", "Category",
                   "Title", "GoodsType", "AdType", "ProductType", "SparePartType", "EngineSparePartType",
                   "BodySparePartType", "DeviceType", "Description", "Condition", "Availability", "Brand", "ImageUrls",
-                  "OEM", "Make", "Model", "Generation", "AdStatus", "Price"]
+                  "OEM", "Make", "Model", "Generation", "AdStatus", "Price", "TransmissionSparePartType"]
 
         if to_upload:
             result_encoding = self.config["result_encoding_upload"]

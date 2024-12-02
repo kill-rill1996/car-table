@@ -23,7 +23,7 @@ def get_product_type_from_xlsx_file(filename: str) -> list:
     """Получение всех ProductType из первой сравнительной таблицы"""
     file = openpyxl.load_workbook(filename)
     sheet_obj = file.active
-    values_area = sheet_obj["B3":"H339"]
+    values_area = sheet_obj["B3":"I342"]
     result = []
 
     for row in values_area:

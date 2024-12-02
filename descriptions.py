@@ -112,14 +112,24 @@ def get_description_rule_1(row: List, rule1_1: bool = None) -> str:
     cell_g = f"На детали указано {row[6].strip()}" + " " if row[6].strip() else ""
     cell_e = f"(код {row[4].strip()})" + " " if row[4].strip() else ""
 
-    if rule1_1:
-        text = f"{cell_c}{cell_b}{cell_v}{cell_w}{cell_x}{cell_u}{cell_j}{cell_p}{cell_q}{cell_r}{cell_ae}" \
-               f"{cell_h}{cell_f}{cell_d}{cell_ac}{cell_g}{cell_e}\n\n{HEADER_BEFORE_TEXTS}\n{TEXT_1}\n{TEXT_2}\n{TEXT_3}\n{TEXT_4}\n{TEXT_5}\n" \
-               f"{TEXT_8}\n{TEXT_5}\n{TEXT_6}\n{TEXT_7}"
+    # разные тексты для "Б/у" и "Новое"
+    if row[1] == "Б/у":
+        if rule1_1:
+            text = f"{cell_c}{cell_b}{cell_v}{cell_w}{cell_x}{cell_u}{cell_j}{cell_p}{cell_q}{cell_r}{cell_ae}" \
+                   f"{cell_h}{cell_f}{cell_d}{cell_ac}{cell_g}{cell_e}\n\n{HEADER_BEFORE_TEXTS}\n{TEXT_1}\n{TEXT_2}\n{TEXT_3}\n{TEXT_4}\n" \
+                   f"{TEXT_8}\n{TEXT_5}\n{TEXT_6}\n{TEXT_7}"
+        else:
+            text = f"{cell_c}{cell_b}{cell_v}{cell_w}{cell_x}{cell_u}{cell_j}{cell_p}{cell_q}{cell_r}{cell_ae}" \
+                   f"{cell_h}{cell_f}{cell_d}{cell_ac}{cell_g}{cell_e}\n\n{HEADER_BEFORE_TEXTS}\n{TEXT_1}\n{TEXT_2}\n{TEXT_3}\n{TEXT_4}\n{TEXT_5}\n" \
+                   f"{TEXT_6}\n{TEXT_7}"
+    # Новое
     else:
-        text = f"{cell_c}{cell_b}{cell_v}{cell_w}{cell_x}{cell_u}{cell_j}{cell_p}{cell_q}{cell_r}{cell_ae}" \
-               f"{cell_h}{cell_f}{cell_d}{cell_ac}{cell_g}{cell_e}\n\n{HEADER_BEFORE_TEXTS}\n{TEXT_1}\n{TEXT_2}\n{TEXT_3}\n{TEXT_4}\n{TEXT_5}\n" \
-               f"{TEXT_6}\n{TEXT_7}"
+        if rule1_1:
+            text = f"{cell_c}{cell_b}{cell_v}{cell_w}{cell_x}{cell_u}{cell_j}{cell_p}{cell_q}{cell_r}{cell_ae}" \
+                   f"{cell_h}{cell_f}{cell_d}{cell_ac}{cell_g}{cell_e}\n\n{HEADER_BEFORE_TEXTS}\n{TEXT_2}\n{TEXT_3}\n{TEXT_4}"
+        else:
+            text = f"{cell_c}{cell_b}{cell_v}{cell_w}{cell_x}{cell_u}{cell_j}{cell_p}{cell_q}{cell_r}{cell_ae}" \
+                   f"{cell_h}{cell_f}{cell_d}{cell_ac}{cell_g}{cell_e}\n\n{HEADER_BEFORE_TEXTS}\n{TEXT_2}\n{TEXT_3}\n{TEXT_4}"
 
     return text
 
@@ -165,12 +175,23 @@ def get_description_rule_2(row: List, rule2_1: bool = None) -> str:
     cell_i = f"цена указана за {row[8].strip()}" + " " if row[8].strip() else ""
     cell_e = f"(код {row[4].strip()})" + " " if row[4].strip() else ""
 
-    if rule2_1:
-        text = f"{cell_c}{cell_b}{cell_z}{cell_aa}{cell_ab}{cell_j}{cell_p}{cell_q}{cell_r}{cell_s}{cell_ae}{cell_h}{cell_f}{cell_d}" \
-               f"{cell_ac}{cell_g}{cell_i}{cell_e}\n\n{HEADER_BEFORE_TEXTS}\n{TEXT_12}\n{TEXT_1}\n{TEXT_2}\n{TEXT_3}\n{TEXT_4}\n{TEXT_5}\n{TEXT_6}\n{TEXT_7}"
+    # разные тексты для "Б/у" и "Новое"
+    if row[1] == "Б/у":
+        if rule2_1:
+            text = f"{cell_c}{cell_b}{cell_z}{cell_aa}{cell_ab}{cell_j}{cell_p}{cell_q}{cell_r}{cell_s}{cell_ae}{cell_h}{cell_f}{cell_d}" \
+                   f"{cell_ac}{cell_g}{cell_i}{cell_e}\n\n{HEADER_BEFORE_TEXTS}\n{TEXT_12}\n{TEXT_1}\n{TEXT_2}\n{TEXT_3}\n{TEXT_4}\n{TEXT_5}\n{TEXT_6}\n{TEXT_7}"
+        else:
+            text = f"{cell_c}{cell_b}{cell_z}{cell_aa}{cell_ab}{cell_j}{cell_p}{cell_q}{cell_r}{cell_s}{cell_ae}{cell_h}{cell_f}{cell_d}" \
+                   f"{cell_ac}{cell_g}{cell_i}{cell_e}\n\n{HEADER_BEFORE_TEXTS}\n{TEXT_1}\n{TEXT_2}\n{TEXT_3}\n{TEXT_4}\n{TEXT_5}\n{TEXT_6}\n{TEXT_7}"
+
+    # Новое
     else:
-        text = f"{cell_c}{cell_b}{cell_z}{cell_aa}{cell_ab}{cell_j}{cell_p}{cell_q}{cell_r}{cell_s}{cell_ae}{cell_h}{cell_f}{cell_d}" \
-               f"{cell_ac}{cell_g}{cell_i}{cell_e}\n\n{HEADER_BEFORE_TEXTS}\n{TEXT_1}\n{TEXT_2}\n{TEXT_3}\n{TEXT_4}\n{TEXT_5}\n{TEXT_6}\n{TEXT_7}"
+        if rule2_1:
+            text = f"{cell_c}{cell_b}{cell_z}{cell_aa}{cell_ab}{cell_j}{cell_p}{cell_q}{cell_r}{cell_s}{cell_ae}{cell_h}{cell_f}{cell_d}" \
+                   f"{cell_ac}{cell_g}{cell_i}{cell_e}\n\n{HEADER_BEFORE_TEXTS}\n{TEXT_2}\n{TEXT_3}\n{TEXT_4}"
+        else:
+            text = f"{cell_c}{cell_b}{cell_z}{cell_aa}{cell_ab}{cell_j}{cell_p}{cell_q}{cell_r}{cell_s}{cell_ae}{cell_h}{cell_f}{cell_d}" \
+                   f"{cell_ac}{cell_g}{cell_i}{cell_e}\n\n{HEADER_BEFORE_TEXTS}\n{TEXT_2}\n{TEXT_3}\n{TEXT_4}"
 
     return text
 
@@ -220,18 +241,34 @@ def get_description_rule_3(row: List, rule3_2: bool = None, rule3_3: bool = None
     cell_g = f"На детали указано {row[6].strip()}" + " " if row[6].strip() else ""
     cell_e = f"(код {row[4].strip()})" + " " if row[4].strip() else ""
 
-    if rule3_2:
-        text = f"{cell_c}{cell_b}{cell_v}{cell_w}{cell_x}{cell_u}{cell_z}{cell_aa}{cell_ab}{cell_j}{cell_p}{cell_q}{cell_r}" \
-               f"{cell_ae}{cell_h}{cell_f}{cell_d}{cell_ac}{cell_g}{cell_e}\n\n{HEADER_BEFORE_TEXTS}\n{TEXT_11}\n{TEXT_1}\n{TEXT_2}\n{TEXT_3}\n{TEXT_4}\n{TEXT_5}\n" \
-               f"{TEXT_6}\n{TEXT_7}"
-    elif rule3_3:
-        text = f"{cell_c}{cell_b}{cell_v}{cell_w}{cell_x}{cell_u}{cell_z}{cell_aa}{cell_ab}{cell_j}{cell_p}{cell_q}{cell_r}" \
-               f"{cell_ae}{cell_h}{cell_f}{cell_d}{cell_ac}{cell_g}{cell_e}\n\n{HEADER_BEFORE_TEXTS}\n{TEXT_1}\n{TEXT_2}\n{TEXT_3}\n{TEXT_4}\n{TEXT_9}\n{TEXT_5}\n" \
-               f"{TEXT_6}\n{TEXT_7}"
+    # разные тексты для "Б/у" и "Новое"
+    if row[1] == "Б/у":
+        if rule3_2:
+            text = f"{cell_c}{cell_b}{cell_v}{cell_w}{cell_x}{cell_u}{cell_z}{cell_aa}{cell_ab}{cell_j}{cell_p}{cell_q}{cell_r}" \
+                   f"{cell_ae}{cell_h}{cell_f}{cell_d}{cell_ac}{cell_g}{cell_e}\n\n{HEADER_BEFORE_TEXTS}\n{TEXT_11}\n{TEXT_1}\n{TEXT_2}\n{TEXT_3}\n{TEXT_4}\n{TEXT_5}\n" \
+                   f"{TEXT_6}\n{TEXT_7}"
+        elif rule3_3:
+            text = f"{cell_c}{cell_b}{cell_v}{cell_w}{cell_x}{cell_u}{cell_z}{cell_aa}{cell_ab}{cell_j}{cell_p}{cell_q}{cell_r}" \
+                   f"{cell_ae}{cell_h}{cell_f}{cell_d}{cell_ac}{cell_g}{cell_e}\n\n{HEADER_BEFORE_TEXTS}\n{TEXT_1}\n{TEXT_2}\n{TEXT_3}\n{TEXT_4}\n{TEXT_9}\n{TEXT_5}\n" \
+                   f"{TEXT_6}\n{TEXT_7}"
+        else:
+            text = f"{cell_c}{cell_b}{cell_v}{cell_w}{cell_x}{cell_u}{cell_z}{cell_aa}{cell_ab}{cell_j}{cell_p}{cell_q}{cell_r}" \
+                   f"{cell_ae}{cell_h}{cell_f}{cell_d}{cell_ac}{cell_g}{cell_e}\n\n{HEADER_BEFORE_TEXTS}\n{TEXT_1}\n{TEXT_2}\n{TEXT_3}\n{TEXT_4}\n{TEXT_5}\n" \
+                   f"{TEXT_6}\n{TEXT_7}"
+
+    # Новое
     else:
-        text = f"{cell_c}{cell_b}{cell_v}{cell_w}{cell_x}{cell_u}{cell_z}{cell_aa}{cell_ab}{cell_j}{cell_p}{cell_q}{cell_r}" \
-               f"{cell_ae}{cell_h}{cell_f}{cell_d}{cell_ac}{cell_g}{cell_e}\n\n{HEADER_BEFORE_TEXTS}\n{TEXT_1}\n{TEXT_2}\n{TEXT_3}\n{TEXT_4}\n{TEXT_5}\n" \
-               f"{TEXT_6}\n{TEXT_7}"
+        if rule3_2:
+            text = f"{cell_c}{cell_b}{cell_v}{cell_w}{cell_x}{cell_u}{cell_z}{cell_aa}{cell_ab}{cell_j}{cell_p}{cell_q}{cell_r}" \
+                   f"{cell_ae}{cell_h}{cell_f}{cell_d}{cell_ac}{cell_g}{cell_e}\n\n{HEADER_BEFORE_TEXTS}\n{TEXT_2}\n{TEXT_3}\n{TEXT_4}"
+        elif rule3_3:
+            text = f"{cell_c}{cell_b}{cell_v}{cell_w}{cell_x}{cell_u}{cell_z}{cell_aa}{cell_ab}{cell_j}{cell_p}{cell_q}{cell_r}" \
+                   f"{cell_ae}{cell_h}{cell_f}{cell_d}{cell_ac}{cell_g}{cell_e}\n\n{HEADER_BEFORE_TEXTS}\n{TEXT_2}\n{TEXT_3}\n{TEXT_4}"
+        else:
+            text = f"{cell_c}{cell_b}{cell_v}{cell_w}{cell_x}{cell_u}{cell_z}{cell_aa}{cell_ab}{cell_j}{cell_p}{cell_q}{cell_r}" \
+                   f"{cell_ae}{cell_h}{cell_f}{cell_d}{cell_ac}{cell_g}{cell_e}\n\n{HEADER_BEFORE_TEXTS}\n{TEXT_2}\n{TEXT_3}\n{TEXT_4}"
 
     return text
+
+
 
