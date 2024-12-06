@@ -44,8 +44,13 @@ class AvitoTable:
         if self.config["need_upload_file"]:
             # файл для отправки
             self.init_csv_result_file(to_upload=True)
+
         # файл для чтения
         self.init_csv_result_file()
+
+        # запись в файл для дрома
+        if self.config["need_drom_file"]:
+            self.init_drom_result_file()
 
         # записывает в файл готовые строки
         print("\nЗапись строк в файл...")
@@ -95,6 +100,12 @@ class AvitoTable:
                 # запись для отправки
                 self.write_to_csv_file(result_row, to_upload=True)
 
+            # запись в файл Дром
+            if self.config["need_drom_file"]:
+                correct_row = self._create_correct_row_dor_drom(result_row)
+                self.write_to_drom_file(correct_row)
+
+
     def _is_row_valid(self, row: list) -> bool:
         """Проверяет валидность строки по длине и первому значению"""
         if len(row) < 34 or row[0] != "Товары":
@@ -112,7 +123,11 @@ class AvitoTable:
             self.errors[self.row_count] = [err_msg]
 
     def _get_result_row(self, csv_row: list) -> (list, list):
-        """Формирование финальной строки для из строки csv файла"""
+        """Формирование финальной строки для из строки csv файла
+        result_row: [Id, AvitoId, ManagerName, ContactPhone, Address, Category, Title, GoodsType
+        AdType, ProductType, SparePartType, EngineSparePartType, BodySparePartType, DeviceType
+        Description, Condition, Availability, Brand, ImageUrls, OEM, Make, Model, Generation
+        AdStatus, Price, TransmissionSparePartType]"""
         result_row = list()
 
         result_row.append(csv_row[4])  # Id
@@ -252,6 +267,45 @@ class AvitoTable:
             writer = csv.writer(file, delimiter=";")
             writer.writerow(row)
 
+    def write_to_drom_file(self, row: list):
+        """Записывает результирующую строку в файл для Дром"""
+        filename = self.config["result_encoding_drom_filename"]
+        result_encoding = self.config["result_encoding_drom"]
+
+        with open(filename, 'a', newline="\n", encoding=result_encoding) as file:
+            writer = csv.writer(file, delimiter=";")
+            writer.writerow(row)
+
+    def _create_correct_row_dor_drom(self, avito_row: list) -> list:
+        """изменение строки для записи в авито в строку для записи в дром
+        avito_row: [Id-0, AvitoId-1, ManagerName-2, ContactPhone-3, Address-4, Category-5, Title-6, GoodsType-7
+        AdType-8, ProductType-9, SparePartType-10, EngineSparePartType-11, BodySparePartType-12, DeviceType-13
+        Description-14, Condition-15, Availability-16, Brand-17, ImageUrls-18, OEM-19, Make-20, Model-21, Generation-22
+        AdStatus-23, Price-24, TransmissionSparePartType-25]"""
+
+        new_row = []
+        new_row.append(avito_row[0]) # Артикул
+        new_row.append(avito_row[6]) # Наименование товара
+        new_row.append(avito_row[15]) # Новый/б.у.
+        new_row.append(avito_row[20]) # Марка
+        new_row.append(avito_row[21]) # Модель
+        new_row.append(avito_row[22]) # Кузов
+        new_row.append(avito_row[19]) # Номер
+        new_row.append("ДВИГАТЕЛЬ МОДЕЛЬ") # Двигатель TODO
+        new_row.append("ГОД") # ГОД TODO
+        new_row.append("L-R") # L-R TODO
+        new_row.append("F-R") # F-R TODO
+        new_row.append("U-D") # U-D TODO
+        new_row.append("Цвет") # Цвет TODO
+        new_row.append(avito_row[14]) # Примечание TODO необходимо подправить
+        new_row.append("КОЛИЧЕСТВО")  # Количество TODO необходимо подправить
+        new_row.append(avito_row[24]) # Цена подправить
+        new_row.append(avito_row[16]) # Наличие
+        new_row.append("Номер детали") # номер детали TODO
+        new_row.append("Ед. изм") # ед. изм TODO
+        new_row.append(avito_row[18]) # фотографии
+        return new_row
+
     def init_csv_result_file(self, to_upload: bool = False):
         """Создает файл для записи результатов и устанавливает заголовок"""
         header = ["Id", "AvitoId", "ManagerName", "ContactPhone", "Address", "Category",
@@ -267,6 +321,16 @@ class AvitoTable:
             filename = self.config["result_encoding_local_filename"]
 
         with open(filename, 'w', newline="\n", encoding=result_encoding) as file:
+            writer = csv.writer(file, delimiter=";")
+            writer.writerow(header)
+
+    def init_drom_result_file(self):
+        header = ["Артикул", "Наименование товара", "Новый/б.у.", "Марка", "Модель", "Кузов", "Номер",
+                  "Двигатель", "Год", "L-R", "F-R", "U-D", "Цвет", "Примечание", "Количество", "Цена",
+                  "Наличие", "№ Детали", "Ед.изм", "Фотографии"]
+        result_encoding = self.config["result_encoding_drom"]
+
+        with open(self.config["result_encoding_drom_filename"], "w", newline="\n", encoding=result_encoding) as file:
             writer = csv.writer(file, delimiter=";")
             writer.writerow(header)
 
