@@ -5,7 +5,7 @@ from functools import wraps
 from typing import Callable
 
 from config import get_config
-from descriptions import get_description
+from descriptions import get_description, get_description_drom
 from get_from_xlsx_files import get_product_type_from_xlsx_file, get_make_model_generation_from_xlsx_file
 
 
@@ -104,7 +104,6 @@ class AvitoTable:
             if self.config["need_drom_file"]:
                 correct_row = self._create_correct_row_dor_drom(result_row)
                 self.write_to_drom_file(correct_row)
-
 
     def _is_row_valid(self, row: list) -> bool:
         """Проверяет валидность строки по длине и первому значению"""
@@ -284,6 +283,7 @@ class AvitoTable:
         AdStatus-23, Price-24, TransmissionSparePartType-25]"""
 
         new_row = []
+
         new_row.append(avito_row[0]) # Артикул
         new_row.append(avito_row[6]) # Наименование товара
         new_row.append(avito_row[15]) # Новый/б.у.
@@ -297,7 +297,7 @@ class AvitoTable:
         new_row.append("F-R") # F-R TODO
         new_row.append("U-D") # U-D TODO
         new_row.append("Цвет") # Цвет TODO
-        new_row.append(avito_row[14]) # Примечание TODO необходимо подправить
+        new_row.append(get_description_drom(avito_row[14]))  # Примечание
         new_row.append("КОЛИЧЕСТВО")  # Количество TODO необходимо подправить
         new_row.append(avito_row[24]) # Цена подправить
         new_row.append(avito_row[16]) # Наличие

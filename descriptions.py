@@ -271,4 +271,11 @@ def get_description_rule_3(row: List, rule3_2: bool = None, rule3_3: bool = None
     return text
 
 
+def get_description_drom(desc_avito: str) -> str:
+    """Изменение описания Авито для дрома"""
+    additional_text = "\n\nМы продаем именно тот товар который на фото, но цена может отличаться в зависимости от коплектации.\n\n" \
+                      "Возможна отправка СДЕК, Энергия."
+
+    result = desc_avito.split("\n\n")[0] + additional_text
+    return result
 
