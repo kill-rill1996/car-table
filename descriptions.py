@@ -276,6 +276,9 @@ def get_description_drom(desc_avito: str) -> str:
     additional_text = "\n\nМы продаем именно тот товар который на фото, но цена может отличаться в зависимости от коплектации.\n\n" \
                       "Возможна отправка СДЕК, Энергия."
 
-    result = desc_avito.split("\n\n")[0] + additional_text
+    if desc_avito:
+        result = desc_avito.split("\n\n")[0] + additional_text
+    else:
+        return additional_text
     return result
 

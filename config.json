@@ -12,7 +12,7 @@
   "availability": "В наличии",
   "ad_status": "Free",
   "1C_file_encoding": "cp1251",
-  "max_rows": 10,
+  "max_rows": 50,
   "version": "macos",
   "result_encoding_upload": "utf-8",
   "result_encoding_upload_filename": "result_avito.csv",
