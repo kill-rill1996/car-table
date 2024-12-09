@@ -107,7 +107,9 @@ class AvitoTable:
                     "U-D": row[26],
                     "F-R": row[27],
                     "count": row[32],
-                    "units_of_meas": row[8]
+                    "units_of_meas": row[8],
+                    "engine": row[21],
+                    "detail_number": row[7],
                 }
                 correct_row = self._create_correct_row_dor_drom(result_row, add_params)
                 self.write_to_drom_file(correct_row)
@@ -298,7 +300,7 @@ class AvitoTable:
         new_row.append(avito_row[21])   # Модель
         new_row.append(avito_row[22])   # Кузов
         new_row.append(avito_row[19])   # Номер
-        new_row.append(avito_row[21])   # Двигатель TODO
+        new_row.append(add_params["engine"])   # Двигатель TODO
         new_row.append("")   # ГОД TODO
 
         if add_params["L-R"] != "":
@@ -323,7 +325,7 @@ class AvitoTable:
 
         new_row.append(avito_row[24])   # Цена подправить
         new_row.append(avito_row[16])   # Наличие
-        new_row.append("Номер детали")  # номер детали TODO
+        new_row.append(add_params["detail_number"])  # номер детали TODO
         new_row.append(add_params["units_of_meas"])    # ед. изм TODO
         new_row.append(avito_row[18])   # фотографии
         return new_row
