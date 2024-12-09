@@ -103,10 +103,10 @@ class AvitoTable:
             # запись в файл Дром с подготовкой строки с изменениями
             if self.config["need_drom_file"]:
                 add_params = {
-                    "L-R": row[24],
-                    "U-D": row[25],
-                    "F-R": row[26],
-                    # "count": row[31],
+                    "L-R": row[25],
+                    "U-D": row[26],
+                    "F-R": row[27],
+                    "count": row[32],
                     "units_of_meas": row[8]
                 }
                 correct_row = self._create_correct_row_dor_drom(result_row, add_params)
@@ -299,7 +299,7 @@ class AvitoTable:
         new_row.append(avito_row[22])   # Кузов
         new_row.append(avito_row[19])   # Номер
         new_row.append(avito_row[21])   # Двигатель TODO
-        new_row.append("ГОД")   # ГОД TODO
+        new_row.append("")   # ГОД TODO
 
         if add_params["L-R"] != "":
             new_row.append(add_params["L-R"])   # L-R TODO
@@ -316,10 +316,10 @@ class AvitoTable:
         else:
             new_row.append("")  # U-D TODO
 
-        new_row.append("Цвет")  # Цвет TODO
+        new_row.append("")  # Цвет TODO
         new_row.append(get_description_drom(avito_row[14]))  # Примечание
 
-        new_row.append("")  # Количество TODO решили убрать пока
+        new_row.append(add_params["count"])  # Количество TODO решили убрать пока
 
         new_row.append(avito_row[24])   # Цена подправить
         new_row.append(avito_row[16])   # Наличие
