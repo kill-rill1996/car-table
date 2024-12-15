@@ -110,8 +110,9 @@ class AvitoTable:
                     "units_of_meas": row[8],
                     "engine": row[21],
                     "detail_number": row[7],
+                    "price": self._get_price(row[14], "commission_drom")
                 }
-                correct_row = self._create_correct_row_dor_drom(result_row, add_params)
+                correct_row = self._create_correct_row_for_drom(result_row, add_params)
                 self.write_to_drom_file(correct_row)
 
     def _is_row_valid(self, row: list) -> bool:
@@ -184,23 +185,30 @@ class AvitoTable:
         oem_filed = self._get_oem_field(csv_row)
         result_row.append(oem_filed)  # OEM
 
-        make_model_generation = self._get_make_model_generation(csv_row[15], csv_row[16], csv_row[17])
-        result_row.append(make_model_generation[0])  # Make строка
-        result_row.append(make_model_generation[1])  # Model строка
-        result_row.append(make_model_generation[2])  # Generation строка
-        # result_row.append(make_model_generation[3])  # Modification строка
-        # result_row.append(make_model_generation[4])  # FuelType строка
-        # result_row.append(make_model_generation[5])  # DriveType строка
-        # result_row.append(make_model_generation[6])  # Transmission строка
-        # result_row.append(make_model_generation[7])  # BodyType строка
-        # result_row.append(make_model_generation[8])  # Doors строка
+        # для грузовиков make model modification берем из исходника
+        if csv_row[12] == "ГРУЗОВИК":
+            result_row.append(csv_row[15])  # Make строка
+            result_row.append(csv_row[16])  # Model строка
+            result_row.append(csv_row[17])  # Generation строка
+        # для всех остальных
+        else:
+            make_model_generation = self._get_make_model_generation(csv_row[15], csv_row[16], csv_row[17])
+            result_row.append(make_model_generation[0])  # Make строка
+            result_row.append(make_model_generation[1])  # Model строка
+            result_row.append(make_model_generation[2])  # Generation строка
+            # result_row.append(make_model_generation[3])  # Modification строка
+            # result_row.append(make_model_generation[4])  # FuelType строка
+            # result_row.append(make_model_generation[5])  # DriveType строка
+            # result_row.append(make_model_generation[6])  # Transmission строка
+            # result_row.append(make_model_generation[7])  # BodyType строка
+            # result_row.append(make_model_generation[8])  # Doors строка
 
         if self.config["version"] == "windows":
             result_row.append(self.config["ad_status"])  # AdStatus
         else:
             result_row.append(self.config["ad_status"])  # AdStatus
 
-        rounded_price = self._get_price(csv_row[14])
+        rounded_price = self._get_price(csv_row[14], "commission_avito")
         result_row.append(rounded_price)  # Price
 
         result_row.append(product_info[5])  # TransmissionSparePartType
@@ -284,7 +292,7 @@ class AvitoTable:
             writer = csv.writer(file, delimiter=";")
             writer.writerow(row)
 
-    def _create_correct_row_dor_drom(self, avito_row: list, add_params: dict) -> list:
+    def _create_correct_row_for_drom(self, avito_row: list, add_params: dict) -> list:
         """изменение строки для записи в авито в строку для записи в дром
         avito_row: [Id-0, AvitoId-1, ManagerName-2, ContactPhone-3, Address-4, Category-5, Title-6, GoodsType-7
         AdType-8, ProductType-9, SparePartType-10, EngineSparePartType-11, BodySparePartType-12, DeviceType-13
@@ -294,7 +302,7 @@ class AvitoTable:
         new_row = []
 
         new_row.append(avito_row[0])    # Артикул
-        new_row.append(avito_row[6])    # Наименование товара
+        new_row.append(avito_row[6] + "_" + avito_row[0])    # Наименование товара
         new_row.append(avito_row[15])   # Новый/б.у.
         new_row.append(avito_row[20])   # Марка
         new_row.append(avito_row[21])   # Модель
@@ -323,7 +331,7 @@ class AvitoTable:
 
         new_row.append(add_params["count"])  # Количество TODO решили убрать пока
 
-        new_row.append(avito_row[24])   # Цена подправить
+        new_row.append(add_params["price"])   # Цена с комиссией для дрома
         new_row.append(avito_row[16])   # Наличие
         new_row.append(add_params["detail_number"])  # номер детали TODO
         new_row.append(add_params["units_of_meas"])    # ед. изм TODO
@@ -380,7 +388,7 @@ class AvitoTable:
                 file.write("Все строки записаны, ошибок нет")
             print("Все строки записаны, ошибок нет")
 
-    def _get_price(self, price: int | str) -> int | None:
+    def _get_price(self, price: int | str, commission: str) -> int | None:
         """Получение цены"""
         try:
             int_price = int(price)
@@ -391,9 +399,9 @@ class AvitoTable:
             except ValueError:
                 self._add_error(f"Некорректная цена: \"{price}\"")
                 return
-            return self._get_round_price_with_commission(int_price)
+            return self._get_round_price_with_commission(int_price, commission)
 
-        return self._get_round_price_with_commission(int_price)
+        return self._get_round_price_with_commission(int_price, commission)
 
     @staticmethod
     def round_to_up(number: int) -> int:
@@ -414,7 +422,7 @@ class AvitoTable:
         else:
             return AvitoTable.round_to_down(number)
 
-    def _get_round_price_with_commission(self, number: int) -> int:
+    def _get_round_price_with_commission(self, number: int, commission: str) -> int:
         """Округляет число до 100"""
-        price_with_commission = number * (1 + self.config["commission"] / 100)
+        price_with_commission = number * (1 + self.config[f"{commission}"] / 100)
         return AvitoTable.round_to_100(price_with_commission)
