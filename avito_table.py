@@ -173,6 +173,7 @@ class AvitoTable:
 
         # заранее получаем make model generation
         make_model_generation = self._get_make_model_generation(csv_row[15], csv_row[16], csv_row[17])
+        print(make_model_generation)
 
         description = get_description(csv_row, make_model_generation)
         result_row.append(description)  # Description
@@ -285,10 +286,6 @@ class AvitoTable:
             result_encoding = self.config["result_encoding_local"]
             filename = self.config["result_encoding_local_filename"]
 
-        # запись даты в название файла
-        date = datetime.now(tz=pytz.timezone("Europe/Moscow")).strftime("%d-%m-%Y")
-        filename = f"{filename}_{date}.csv"
-
         with open(filename, 'a', newline="\n", encoding=result_encoding) as file:
             writer = csv.writer(file, delimiter=";")
             writer.writerow(row)
@@ -297,10 +294,6 @@ class AvitoTable:
         """Записывает результирующую строку в файл для Дром"""
         filename = self.config["result_encoding_drom_filename"]
         result_encoding = self.config["result_encoding_drom"]
-
-        # добавление даты в название
-        date = datetime.now(tz=pytz.timezone("Europe/Moscow")).strftime("%d-%m-%Y")
-        filename = f"{filename}_{date}.csv"
 
         with open(filename, 'a', newline="\n", encoding=result_encoding) as file:
             writer = csv.writer(file, delimiter=";")
@@ -367,10 +360,6 @@ class AvitoTable:
             result_encoding = self.config["result_encoding_local"]
             filename = self.config["result_encoding_local_filename"]
 
-        # добавление даты к имени файла
-        date = datetime.now(tz=pytz.timezone("Europe/Moscow")).strftime("%d-%m-%Y")
-        filename = f"{filename}_{date}.csv"
-
         with open(filename, 'w', newline="\n", encoding=result_encoding) as file:
             writer = csv.writer(file, delimiter=";")
             writer.writerow(header)
@@ -381,11 +370,7 @@ class AvitoTable:
                   "Наличие", "№ Детали", "Ед.изм", "Фотографии"]
         result_encoding = self.config["result_encoding_drom"]
 
-        # добавление даты к имени файла
-        date = datetime.now(tz=pytz.timezone("Europe/Moscow")).strftime("%d-%m-%Y")
-        filename = f"{self.config['result_encoding_drom_filename']}_{date}.csv"
-
-        with open(filename, "w", newline="\n", encoding=result_encoding) as file:
+        with open(self.config['result_encoding_drom_filename'], "w", newline="\n", encoding=result_encoding) as file:
             writer = csv.writer(file, delimiter=";")
             writer.writerow(header)
 

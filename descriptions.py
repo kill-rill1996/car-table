@@ -22,9 +22,11 @@ def get_description(row: List, mmg: List) -> str:
     Make Model Generation (mmg) берутся не из исходной строки"""
     group = row[12]
     sub_group = row[13]
+    mmg = [str(i) for i in mmg]
 
     # rule 1
-    if group == "ДВИГАТЕЛЬ" and sub_group != "ДВС":
+    if (group == "ДВИГАТЕЛЬ" and sub_group != "ДВС") \
+        or (group == "ГРУЗОВИК" and sub_group == "ДВИГАТЕЛЬ"):
         return get_description_rule_1(row, mmg)
 
     # rule 1.1
@@ -39,13 +41,14 @@ def get_description(row: List, mmg: List) -> str:
             return get_description_rule_2(row, mmg)
 
     # rule 2
-    if group in ["КУЗОВ_ВНУТРИ", "ОПТИКА", "СИСТЕМА_БЕЗОПАСНОСТИ_SRS", "СТЕКЛА_КУЗОВНЫЕ"]:
+    if group in ["КУЗОВ_ВНУТРИ", "ОПТИКА", "СИСТЕМА_БЕЗОПАСНОСТИ_SRS", "СТЕКЛА_КУЗОВНЫЕ"] \
+            or (group == "ГРУЗОВИК" and sub_group in ["КАБИНА", "ЭЛЕКТРИКА"]):
         return get_description_rule_2(row, mmg)
 
     # rule 3
     if group == "ПОДВЕСКА_ПЕРЕДНИХ_И_ЗАДНИХ КОЛЕС":
         if sub_group not in ["Колпак_колеса", "Диск_колпак_колесный", "Колесо"]:
-            return get_description_rule_3(row)
+            return get_description_rule_3(row, mmg)
         else:
             if sub_group == "Колпак_колеса":
                 return "ПРАВИЛО 4" # TODO
@@ -53,6 +56,9 @@ def get_description(row: List, mmg: List) -> str:
                 return "ПРАВИЛО 5" # TODO
             elif sub_group == "Колесо":
                 return "ПРАВИЛО 6" # TODO
+
+    if group == "ГРУЗОВИК" and sub_group == "ХОДОВАЯ":
+        return get_description_rule_3(row, mmg)
 
     # rule 3.1
     if group in ["РУЛЕВОЕ_УПРАВЛЕНИЕ", "СИСТЕМА_ВЫПУСКА_ОТРАБОТАННЫХ_ГАЗОВ", "ТОРМОЗНАЯ_СИСТЕМА", "ЭЛЕКТРООСНАЩЕНИЕ"]:
@@ -71,6 +77,10 @@ def get_description(row: List, mmg: List) -> str:
             return get_description_rule_3(row, mmg, rule3_3=True)
         else:
             return get_description_rule_3(row, mmg)
+
+    # rule 3.4
+    if group == "ГРУЗОВИК" and sub_group == "ТРАНСМИССИЯ":
+        return get_description_rule_3(row, mmg, rule3_4=True)
 
 
 def get_description_rule_1(row: List, mmg: List, rule1_1: bool = None) -> str:
@@ -227,7 +237,7 @@ def get_description_rule_2(row: List, mmg: List, rule2_1: bool = None) -> str:
     return text
 
 
-def get_description_rule_3(row: List, mmg: List, rule3_2: bool = None, rule3_3: bool = None) -> str:
+def get_description_rule_3(row: List, mmg: List, rule3_2: bool = None, rule3_3: bool = None, rule3_4: bool = None) -> str:
     """Группы ПОДВЕСКА_ПЕРЕДНИХ_ И_ЗАДНИХ КОЛЕС (за исключением подгруппы Колпак_колеса, Диск_колпак_колесный, Колесо),
     РУЛЕВОЕ_УПРАВЛЕНИЕ, СИСТЕМА_ВЫПУСКА_ОТРАБОТАННЫХ_ГАЗОВ, СИСТЕМА_ОХЛАЖДЕНИЯ_И_ОТОПЛЕНИЯ (за исключением подгруппы Компрессор_кондиционера),
     ТОРМОЗНАЯ_СИСТЕМА, ТРАНСМИССИЯ_И_ПРИВОД, ЭЛЕКТРООСНАЩЕНИЕ"""
@@ -294,6 +304,10 @@ def get_description_rule_3(row: List, mmg: List, rule3_2: bool = None, rule3_3: 
                    f"{cell_ae}{cell_h}{cell_f}{cell_d}{cell_ac}{cell_g}{cell_e}\n\n{HEADER_BEFORE_TEXTS}\n{TEXT_11}\n{TEXT_1}\n{TEXT_2}\n{TEXT_3}\n{TEXT_4}\n{TEXT_5}\n" \
                    f"{TEXT_6}\n{TEXT_7}"
         elif rule3_3:
+            text = f"{cell_c}{cell_b}{cell_v}{cell_w}{cell_x}{cell_u}{cell_z}{cell_aa}{cell_ab}{cell_j}{cell_p}{cell_q}{cell_r}" \
+                   f"{cell_ae}{cell_h}{cell_f}{cell_d}{cell_ac}{cell_g}{cell_e}\n\n{HEADER_BEFORE_TEXTS}\n{TEXT_1}\n{TEXT_2}\n{TEXT_3}\n{TEXT_4}\n{TEXT_9}\n{TEXT_5}\n" \
+                   f"{TEXT_6}\n{TEXT_7}"
+        elif rule3_4:
             text = f"{cell_c}{cell_b}{cell_v}{cell_w}{cell_x}{cell_u}{cell_z}{cell_aa}{cell_ab}{cell_j}{cell_p}{cell_q}{cell_r}" \
                    f"{cell_ae}{cell_h}{cell_f}{cell_d}{cell_ac}{cell_g}{cell_e}\n\n{HEADER_BEFORE_TEXTS}\n{TEXT_1}\n{TEXT_2}\n{TEXT_3}\n{TEXT_4}\n{TEXT_9}\n{TEXT_5}\n" \
                    f"{TEXT_6}\n{TEXT_7}"
