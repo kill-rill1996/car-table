@@ -17,29 +17,30 @@ TEXT_12 = "Цена на ДВЕРИ указана за голую дверь (�
 HEADER_BEFORE_TEXTS = "Условия продажи:"
 
 
-def get_description(row: List) -> str:
-    """Общая функция для подготовки description по группам и подгруппам из 1С файла"""
+def get_description(row: List, mmg: List) -> str:
+    """Общая функция для подготовки description по группам и подгруппам из 1С файла
+    Make Model Generation (mmg) берутся не из исходной строки"""
     group = row[12]
     sub_group = row[13]
 
     # rule 1
     if group == "ДВИГАТЕЛЬ" and sub_group != "ДВС":
-        return get_description_rule_1(row)
+        return get_description_rule_1(row, mmg)
 
     # rule 1.1
     if group == "ДВИГАТЕЛЬ" and sub_group == "ДВС":
-        return get_description_rule_1(row, rule1_1=True)
+        return get_description_rule_1(row, mmg, rule1_1=True)
 
     # rule 2
     if group == "КУЗОВ_НАРУЖНЫЕ_ЭЛЕМЕНТЫ":
         if sub_group == "Двери":
-            return get_description_rule_2(row, rule2_1=True)
+            return get_description_rule_2(row, mmg, rule2_1=True)
         else:
-            return get_description_rule_2(row)
+            return get_description_rule_2(row, mmg)
 
     # rule 2
     if group in ["КУЗОВ_ВНУТРИ", "ОПТИКА", "СИСТЕМА_БЕЗОПАСНОСТИ_SRS", "СТЕКЛА_КУЗОВНЫЕ"]:
-        return get_description_rule_2(row)
+        return get_description_rule_2(row, mmg)
 
     # rule 3
     if group == "ПОДВЕСКА_ПЕРЕДНИХ_И_ЗАДНИХ КОЛЕС":
@@ -55,24 +56,24 @@ def get_description(row: List) -> str:
 
     # rule 3.1
     if group in ["РУЛЕВОЕ_УПРАВЛЕНИЕ", "СИСТЕМА_ВЫПУСКА_ОТРАБОТАННЫХ_ГАЗОВ", "ТОРМОЗНАЯ_СИСТЕМА", "ЭЛЕКТРООСНАЩЕНИЕ"]:
-        return get_description_rule_3(row)
+        return get_description_rule_3(row, mmg)
 
     # rule 3.2
     if group == "СИСТЕМА_ОХЛАЖДЕНИЯ_И_ОТОПЛЕНИЯ":
         if sub_group == "Компрессор_кондиционера":
-            return get_description_rule_3(row, rule3_2=True)
+            return get_description_rule_3(row, mmg, rule3_2=True)
         else:
-            return get_description_rule_3(row)
+            return get_description_rule_3(row, mmg)
 
     # rule 3.3
     if group == "ТРАНСМИССИЯ_И_ПРИВОД":
         if sub_group == "Коробка_Переменных_Передач_(КПП)":
-            return get_description_rule_3(row, rule3_3=True)
+            return get_description_rule_3(row, mmg, rule3_3=True)
         else:
-            return get_description_rule_3(row)
+            return get_description_rule_3(row, mmg)
 
 
-def get_description_rule_1(row: List, rule1_1: bool = None) -> str:
+def get_description_rule_1(row: List, mmg: List, rule1_1: bool = None) -> str:
     """Группа «ДВИГАТЕЛЬ» все подгруппы за исключением подгруппы «ДВС»"""
     cell_c = row[2].strip() + " " if row[2].strip() else ""
     cell_b = row[1].strip() + " " if row[1].strip() else ""
@@ -89,20 +90,35 @@ def get_description_rule_1(row: List, rule1_1: bool = None) -> str:
     else:
         cell_j = f"Производитель {row[9].strip()}" + " "
 
-    if row[15].strip() == "ALL" or row[15].strip() == "":
+    # if row[15].strip() == "ALL" or row[15].strip() == "":
+    #     cell_p = ""
+    # else:
+    #     cell_p = f"На авто {row[15].strip()}" + " "
+    #
+    # if row[16].strip() == "ALL" or row[16].strip() == " ":
+    #     cell_q = ""
+    # else:
+    #     cell_q = f"модель {row[16].strip()}" + " "
+    #
+    # if row[17].strip() == "ALL" or row[17].strip() == "":
+    #     cell_r = ""
+    # else:
+    #     cell_r = f"Поколение {row[17].strip()}" + " "
+
+    if mmg[0].strip() == "ALL" or mmg[0].strip() == "":
         cell_p = ""
     else:
-        cell_p = f"На авто {row[15].strip()}" + " "
+        cell_p = f"На авто {mmg[0].strip()}" + " "
 
-    if row[16].strip() == "ALL" or row[16].strip() == " ":
+    if mmg[1].strip() == "ALL" or mmg[1].strip() == "":
         cell_q = ""
     else:
-        cell_q = f"модель {row[16].strip()}" + " "
+        cell_q = f"модель {mmg[1].strip()}" + " "
 
-    if row[17].strip() == "ALL" or row[17].strip() == "":
+    if mmg[2].strip() == "ALL" or mmg[2].strip() == "":
         cell_r = ""
     else:
-        cell_r = f"Поколение {row[17].strip()}" + " "
+        cell_r = f"Поколение {mmg[2].strip()}" + " "
 
     cell_ae = f"Доп инф {row[30].strip()}" + " " if row[30].strip() else ""
     cell_h = f"Номер детали {row[7].strip()}" + " " if row[7].strip() else ""
@@ -134,7 +150,7 @@ def get_description_rule_1(row: List, rule1_1: bool = None) -> str:
     return text
 
 
-def get_description_rule_2(row: List, rule2_1: bool = None) -> str:
+def get_description_rule_2(row: List, mmg: List, rule2_1: bool = None) -> str:
     """Группы «КУЗОВ»,«ОПТИКА», СИСТЕМА_БЕЗОПАСНОСТИ_SRS СТЕКЛА_КУЗОВНЫЕ"""
     cell_c = row[2].strip() + " " if row[2].strip() else ""
     cell_b = row[1].strip() + " " if row[1].strip() else ""
@@ -150,20 +166,35 @@ def get_description_rule_2(row: List, rule2_1: bool = None) -> str:
     else:
         cell_j = f"Производитель {row[9].strip()}" + " "
 
-    if row[15].strip() == "ALL" or row[15].strip() == "":
+    # if row[15].strip() == "ALL" or row[15].strip() == "":
+    #     cell_p = ""
+    # else:
+    #     cell_p = f"На авто {row[15].strip()}" + " "
+    #
+    # if row[16].strip() == "ALL" or row[16].strip() == " ":
+    #     cell_q = ""
+    # else:
+    #     cell_q = f"модель {row[16].strip()}" + " "
+    #
+    # if row[17].strip() == "ALL" or row[17].strip() == "":
+    #     cell_r = ""
+    # else:
+    #     cell_r = f"Поколение {row[17].strip()}" + " "
+
+    if mmg[0].strip() == "ALL" or mmg[0].strip() == "":
         cell_p = ""
     else:
-        cell_p = f"На авто {row[15].strip()}" + " "
+        cell_p = f"На авто {mmg[0].strip()}" + " "
 
-    if row[16].strip() == "ALL" or row[16].strip() == " ":
+    if mmg[1].strip() == "ALL" or mmg[1].strip() == "":
         cell_q = ""
     else:
-        cell_q = f"модель {row[16].strip()}" + " "
+        cell_q = f"модель {mmg[1].strip()}" + " "
 
-    if row[17].strip() == "ALL" or row[17].strip() == "":
+    if mmg[2].strip() == "ALL" or mmg[2].strip() == "":
         cell_r = ""
     else:
-        cell_r = f"Поколение {row[17].strip()}" + " "
+        cell_r = f"Поколение {mmg[2].strip()}" + " "
 
     cell_s = f"Тип кузова {row[20].strip()}" + " " if row[20].strip() else ""
     cell_ae = f"Доп инф {row[30].strip()}" + " " if row[30].strip() else ""
@@ -196,7 +227,7 @@ def get_description_rule_2(row: List, rule2_1: bool = None) -> str:
     return text
 
 
-def get_description_rule_3(row: List, rule3_2: bool = None, rule3_3: bool = None) -> str:
+def get_description_rule_3(row: List, mmg: List, rule3_2: bool = None, rule3_3: bool = None) -> str:
     """Группы ПОДВЕСКА_ПЕРЕДНИХ_ И_ЗАДНИХ КОЛЕС (за исключением подгруппы Колпак_колеса, Диск_колпак_колесный, Колесо),
     РУЛЕВОЕ_УПРАВЛЕНИЕ, СИСТЕМА_ВЫПУСКА_ОТРАБОТАННЫХ_ГАЗОВ, СИСТЕМА_ОХЛАЖДЕНИЯ_И_ОТОПЛЕНИЯ (за исключением подгруппы Компрессор_кондиционера),
     ТОРМОЗНАЯ_СИСТЕМА, ТРАНСМИССИЯ_И_ПРИВОД, ЭЛЕКТРООСНАЩЕНИЕ"""
@@ -218,20 +249,35 @@ def get_description_rule_3(row: List, rule3_2: bool = None, rule3_3: bool = None
     else:
         cell_j = f"Производитель {row[9].strip()}" + " "
 
-    if row[15].strip() == "ALL" or row[15].strip() == "":
+    # if row[15].strip() == "ALL" or row[15].strip() == "":
+    #     cell_p = ""
+    # else:
+    #     cell_p = f"На авто {row[15].strip()}" + " "
+    #
+    # if row[16].strip() == "ALL" or row[16].strip() == " ":
+    #     cell_q = ""
+    # else:
+    #     cell_q = f"модель {row[16].strip()}" + " "
+    #
+    # if row[17].strip() == "ALL" or row[17].strip() == "":
+    #     cell_r = ""
+    # else:
+    #     cell_r = f"Поколение {row[17].strip()}" + " "
+
+    if mmg[0].strip() == "ALL" or mmg[0].strip() == "":
         cell_p = ""
     else:
-        cell_p = f"На авто {row[15].strip()}" + " "
+        cell_p = f"На авто {mmg[0].strip()}" + " "
 
-    if row[16].strip() == "ALL" or row[16].strip() == " ":
+    if mmg[1].strip() == "ALL" or mmg[1].strip() == "":
         cell_q = ""
     else:
-        cell_q = f"модель {row[16].strip()}" + " "
+        cell_q = f"модель {mmg[1].strip()}" + " "
 
-    if row[17].strip() == "ALL" or row[17].strip() == "":
+    if mmg[2].strip() == "ALL" or mmg[2].strip() == "":
         cell_r = ""
     else:
-        cell_r = f"Поколение {row[17].strip()}" + " "
+        cell_r = f"Поколение {mmg[2].strip()}" + " "
 
     cell_ae = f"Доп инф {row[30].strip()}" + " " if row[30].strip() else ""
     cell_h = f"Номер детали {row[7].strip()}" + " " if row[7].strip() else ""

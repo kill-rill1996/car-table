@@ -4,6 +4,8 @@ from datetime import datetime
 from functools import wraps
 from typing import Callable
 
+import pytz
+
 from config import get_config
 from descriptions import get_description, get_description_drom
 from get_from_xlsx_files import get_product_type_from_xlsx_file, get_make_model_generation_from_xlsx_file
@@ -169,7 +171,10 @@ class AvitoTable:
         result_row.append(product_info[3])  # BodySparePartType
         result_row.append(product_info[4])  # DeviceType
 
-        description = get_description(csv_row)
+        # заранее получаем make model generation
+        make_model_generation = self._get_make_model_generation(csv_row[15], csv_row[16], csv_row[17])
+
+        description = get_description(csv_row, make_model_generation)
         result_row.append(description)  # Description
 
         result_row.append(csv_row[1])  # Condition
@@ -192,7 +197,6 @@ class AvitoTable:
             result_row.append(csv_row[17])  # Generation строка
         # для всех остальных
         else:
-            make_model_generation = self._get_make_model_generation(csv_row[15], csv_row[16], csv_row[17])
             result_row.append(make_model_generation[0])  # Make строка
             result_row.append(make_model_generation[1])  # Model строка
             result_row.append(make_model_generation[2])  # Generation строка
@@ -212,6 +216,7 @@ class AvitoTable:
         result_row.append(rounded_price)  # Price
 
         result_row.append(product_info[5])  # TransmissionSparePartType
+        result_row.append(product_info[6])  # TechnicSparePartType
 
         if not self._check_correct_brand(csv_row):
             result_row[17] = result_row[20]
@@ -229,6 +234,7 @@ class AvitoTable:
                 result.append(row[3])
                 result.append(row[4])
                 result.append(row[5])
+                result.append(row[9])
 
                 return result
 
@@ -236,7 +242,7 @@ class AvitoTable:
                         f"BodySparePartType, DeviceType, TransmissionSparePartType по группе '{group_m}' "
                         f"и подгруппе '{sub_group_n}'")
 
-        return ["", "", "", "", "", ""]
+        return ["", "", "", "", "", "", ""]
 
     def _get_oem_field(self, row: list) -> str:
         """Получает ОЕМ из 1С колонка F or H or L или случайное число"""
@@ -279,6 +285,10 @@ class AvitoTable:
             result_encoding = self.config["result_encoding_local"]
             filename = self.config["result_encoding_local_filename"]
 
+        # запись даты в название файла
+        date = datetime.now(tz=pytz.timezone("Europe/Moscow")).strftime("%d-%m-%Y")
+        filename = f"{filename}_{date}.csv"
+
         with open(filename, 'a', newline="\n", encoding=result_encoding) as file:
             writer = csv.writer(file, delimiter=";")
             writer.writerow(row)
@@ -287,6 +297,10 @@ class AvitoTable:
         """Записывает результирующую строку в файл для Дром"""
         filename = self.config["result_encoding_drom_filename"]
         result_encoding = self.config["result_encoding_drom"]
+
+        # добавление даты в название
+        date = datetime.now(tz=pytz.timezone("Europe/Moscow")).strftime("%d-%m-%Y")
+        filename = f"{filename}_{date}.csv"
 
         with open(filename, 'a', newline="\n", encoding=result_encoding) as file:
             writer = csv.writer(file, delimiter=";")
@@ -343,14 +357,19 @@ class AvitoTable:
         header = ["Id", "AvitoId", "ManagerName", "ContactPhone", "Address", "Category",
                   "Title", "GoodsType", "AdType", "ProductType", "SparePartType", "EngineSparePartType",
                   "BodySparePartType", "DeviceType", "Description", "Condition", "Availability", "Brand", "ImageUrls",
-                  "OEM", "Make", "Model", "Generation", "AdStatus", "Price", "TransmissionSparePartType"]
+                  "OEM", "Make", "Model", "Generation", "AdStatus", "Price", "TransmissionSparePartType", "TechnicSparePartType"]
 
         if to_upload:
             result_encoding = self.config["result_encoding_upload"]
             filename = self.config["result_encoding_upload_filename"]
+
         else:
             result_encoding = self.config["result_encoding_local"]
             filename = self.config["result_encoding_local_filename"]
+
+        # добавление даты к имени файла
+        date = datetime.now(tz=pytz.timezone("Europe/Moscow")).strftime("%d-%m-%Y")
+        filename = f"{filename}_{date}.csv"
 
         with open(filename, 'w', newline="\n", encoding=result_encoding) as file:
             writer = csv.writer(file, delimiter=";")
@@ -362,7 +381,11 @@ class AvitoTable:
                   "Наличие", "№ Детали", "Ед.изм", "Фотографии"]
         result_encoding = self.config["result_encoding_drom"]
 
-        with open(self.config["result_encoding_drom_filename"], "w", newline="\n", encoding=result_encoding) as file:
+        # добавление даты к имени файла
+        date = datetime.now(tz=pytz.timezone("Europe/Moscow")).strftime("%d-%m-%Y")
+        filename = f"{self.config['result_encoding_drom_filename']}_{date}.csv"
+
+        with open(filename, "w", newline="\n", encoding=result_encoding) as file:
             writer = csv.writer(file, delimiter=";")
             writer.writerow(header)
 
@@ -412,6 +435,7 @@ class AvitoTable:
     def round_to_down(number: int) -> int:
         """Округляет всегда вверх до ста"""
         return int(math.floor(number / 100.0)) * 100
+
     @staticmethod
     def round_to_100(number: int) -> int:
         """Округляет число до 100"""
