@@ -173,7 +173,6 @@ class AvitoTable:
 
         # заранее получаем make model generation
         make_model_generation = self._get_make_model_generation(csv_row[15], csv_row[16], csv_row[17])
-        print(make_model_generation)
 
         description = get_description(csv_row, make_model_generation)
         result_row.append(description)  # Description
