@@ -13,8 +13,8 @@
   "availability": "В наличии",
   "ad_status": "Free",
   "1C_file_encoding": "cp1251",
-  "max_rows": 100,
-  "version": "windows",
+  "max_rows": 10,
+  "version": "macos",
   "result_encoding_upload": "utf-8",
   "result_encoding_upload_filename": "result_avito.csv",
   "result_encoding_local": "cp1251",
@@ -22,5 +22,8 @@
   "need_upload_file": true,
   "result_encoding_drom_filename": "result_drom.csv",
   "result_encoding_drom": "cp1251",
-  "need_drom_file": true
+  "need_drom_file": true,
+  "xml_filename": "result.xml",
+  "xml_file_encoding": "utf-8",
+  "need_xml_file": true
 }
