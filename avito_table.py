@@ -1,5 +1,4 @@
 import csv
-import io
 import math
 from datetime import datetime
 from functools import wraps
@@ -47,15 +46,16 @@ class AvitoTable:
             # файл для отправки
             self.init_csv_result_file(to_upload=True)
 
-        if self.config["need_xml_file"]:
-            self.init_xml_file()
-
         # файл для чтения
         self.init_csv_result_file()
 
-        # запись в файл для дрома
+        # инициализация файла для дрома
         if self.config["need_drom_file"]:
             self.init_drom_result_file()
+
+        # инициализация xml файла
+        if self.config["need_xml_file"]:
+            self.init_xml_file()
 
         # записывает в файл готовые строки
         print("\nЗапись строк в файл...")
@@ -82,10 +82,6 @@ class AvitoTable:
                 self.row_count += 1
                 continue
 
-            # запись xml файла
-            if self.config["need_xml_file"]:
-                self.write_xml_file(row)
-
             # debug version
             if self.config["max_rows"] != -1:
                 if self.row_count > self.config["max_rows"]:
@@ -101,6 +97,17 @@ class AvitoTable:
 
             # получаем готовую строку для записи в авито таблицу
             result_row = self._get_result_row(row)
+
+            # запись xml файла
+            if self.config["need_xml_file"]:
+                add_params_for_xml = {
+                    "brand": str(result_row[20]),  # make from result row
+                    "model": str(result_row[21]),  # model from result row
+                    "modification": str(result_row[22]),   # generation from result row
+                    "spare_brand": str(result_row[17]),  # brand from result row
+                    "oem": str(result_row[19])   # т.к. значение в исходной таблице бывает некорректного формата 1,1E+10
+                }
+                self.write_xml_file(row, add_params_for_xml)
 
             # запись для чтения
             self.write_to_csv_file(result_row)
@@ -123,7 +130,6 @@ class AvitoTable:
                 }
                 correct_row = self._create_correct_row_for_drom(result_row, add_params)
                 self.write_to_drom_file(correct_row)
-
 
     def _is_row_valid(self, row: list) -> bool:
         """Проверяет валидность строки по длине и первому значению"""
@@ -308,7 +314,7 @@ class AvitoTable:
             writer = csv.writer(file, delimiter=";")
             writer.writerow(row)
 
-    def write_xml_file(self, row: list):
+    def write_xml_file(self, row: list, add_params: dict):
         """Записывает данные в xml файл"""
         tree = ET.parse(self.config["xml_filename"])
         root = tree.getroot()
@@ -317,55 +323,63 @@ class AvitoTable:
 
         # code
         code_item = ET.SubElement(offer_item, "code")
-        code_item.text = row[4]
+        code_item.text = str(row[4]).strip()
 
         # title
         title_item = ET.SubElement(offer_item, "title")
-        title_item.text = row[2]
+        title_item.text = str(row[2]).strip()
 
         # is_new
         is_new_item = ET.SubElement(offer_item, "is_new")
-        is_new_item.text = row[1]
+        is_new_item.text = str(row[1]).strip()
 
         # brand
         brand_item = ET.SubElement(offer_item, "brand")
-        brand_item.text = row[15]
+        brand_item.text = add_params["brand"]
 
         # model
         model_item = ET.SubElement(offer_item, "model")
-        model_item.text = row[16]
+        model_item.text = add_params["model"]
 
         # modification
         modification_item = ET.SubElement(offer_item, "modification")
-        modification_item.text = row[17]
+        modification_item.text = add_params["modification"]
 
         # category
         category_item = ET.SubElement(offer_item, "category")
-        category_item.text = row[12]
+        category_item.text = str(row[12]).strip()
 
         # sub_category
         sub_category_item = ET.SubElement(offer_item, "sub_category")
-        sub_category_item.text = row[13]
+        sub_category_item.text = str(row[13]).strip()
 
-        # spare_brand TODO (нет в таблице)
-        # sub_category_item = ET.SubElement(offer_item, "sub_category")
-        # sub_category_item.text = row[13]
+        # spare_brand
+        spare_brand_item = ET.SubElement(offer_item, "spare_brand")
+        spare_brand_item.text = add_params["spare_brand"]
 
         # country TODO (нет в таблице)
         # country_item = ET.SubElement(offer_item, "country")
         # country_item.text = row[13]
 
-        # sku TODO (нет в таблице)
-        # sku_item = ET.SubElement(offer_item, "sku")
-        # sku_item.text = row[13]
+        # sku TODO (в исходном файле попадаются числа формата 1,1E+10)
+        sku_item = ET.SubElement(offer_item, "sku")
+        sku_item.text = str(row[7]).strip()
 
-        # spare_oem TODO (нет в таблице)
-        # spare_oem_item = ET.SubElement(offer_item, "spare_oem")
-        # spare_oem_item.text = row[5]
+        # spare_oem
+        spare_oem_item = ET.SubElement(offer_item, "spare_oem")
+        spare_oem_item.text = str(row[3]).strip()
 
-        # front_back TODO (нет в таблице)
-        # front_back_item = ET.SubElement(offer_item, "front_back")
-        # front_back_item.text = row[5]
+        # engine_model
+        engine_model_item = ET.SubElement(offer_item, "engine_model")
+        engine_model_item.text = str(row[22]).strip()
+
+        # side
+        side_item = ET.SubElement(offer_item, "side")
+        side_item.text = str(row[25]).strip()
+
+        # front_back
+        front_back_item = ET.SubElement(offer_item, "front_back")
+        front_back_item.text = str(row[27]).strip()
 
         # top_bottom TODO (нет в таблице)
         # top_bottom_item = ET.SubElement(offer_item, "top_bottom")
@@ -375,17 +389,17 @@ class AvitoTable:
         # color_item = ET.SubElement(offer_item, "color")
         # color_item.text = row[5]
 
-        # comment TODO (нет в таблице)
-        # comment_item = ET.SubElement(offer_item, "comment")
-        # comment_item.text = row[5]
+        # comment
+        comment_item = ET.SubElement(offer_item, "comment")
+        comment_item.text = str(row[30]).strip()
 
         # price
         price_item = ET.SubElement(offer_item, "price")
-        price_item.text = row[14]
+        price_item.text = str(row[14]).strip()
 
-        # quantity TODO (нет в таблице)
-        # quantity_item = ET.SubElement(offer_item, "quantity")
-        # quantity_item.text = row[14]
+        # quantity
+        quantity_item = ET.SubElement(offer_item, "quantity")
+        quantity_item.text = str(row[32]).strip()
 
         # gearbox_number TODO (нет в таблице)
         # gearbox_number_item = ET.SubElement(offer_item, "gearbox_number")
@@ -395,21 +409,20 @@ class AvitoTable:
         # gearbox_number_alternative_item = ET.SubElement(offer_item, "gearbox_number_alternative")
         # gearbox_number_alternative_item.text = row[14]
 
-        # oem TODO (уже есть spare_oem)
+        # oem (TODO в выгрузке формат данных бывает 1,1E+10, так что берем из результирующих данных)
         oem_item = ET.SubElement(offer_item, "oem")
-        oem_item.text = row[5].strip()
+        oem_item.text = str(add_params["oem"]).strip()
 
-        # model_tovar TODO (нет в таблице)
-        # model_tovar_item = ET.SubElement(offer_item, "model_tovar")
-        # model_tovar_item.text = row[5]
-
-        # images
-        images_item = ET.SubElement(offer_item, "images")
-        images_item.text = row[32]
+        # model_tovar
+        model_tovar_item = ET.SubElement(offer_item, "model_tovar")
+        model_tovar_item.text = str(row[6]).strip()
 
         # images
         images_item = ET.SubElement(offer_item, "images")
-        images_item.text = row[32]
+        images_list = str(row[33]).split("|")
+        for image in images_list:
+            image_item = ET.SubElement(images_item, "image")
+            image_item.text = image
 
         # сохраняем файл
         tree.write(self.config["xml_filename"], encoding=self.config["xml_file_encoding"], xml_declaration=True)
