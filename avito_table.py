@@ -357,6 +357,10 @@ class AvitoTable:
         spare_brand_item = ET.SubElement(offer_item, "spare_brand")
         spare_brand_item.text = add_params["spare_brand"]
 
+        # unit
+        unit_item = ET.SubElement(offer_item, "unit")
+        unit_item.text = "шт"
+
         # country TODO (нет в таблице)
         # country_item = ET.SubElement(offer_item, "country")
         # country_item.text = row[13]
