@@ -198,10 +198,10 @@ def get_description_rule_2(row: List, mmg: List, rule2_1: bool = None) -> str:
     # Новое
     else:
         if rule2_1:
-            text = f"{cell_c}{cell_b}{cell_z}{cell_aa}{cell_ab}{cell_j}{cell_p}{cell_q}{cell_r}{cell_u}{cell_ae}{cell_h}{cell_f}{cell_d}" \
+            text = f"{cell_c}{cell_b}{cell_z}{cell_aa}{cell_ab}{cell_j}{cell_p}{cell_q}{cell_r}{cell_s}{cell_ae}{cell_h}{cell_f}{cell_d}" \
                    f"{cell_ac}{cell_g}{cell_i}{cell_am}\n\n{HEADER_BEFORE_TEXTS}\n{TEXT_2}\n{TEXT_3}\n{TEXT_4}"
         else:
-            text = f"{cell_c}{cell_b}{cell_z}{cell_aa}{cell_ab}{cell_j}{cell_p}{cell_q}{cell_r}{cell_u}{cell_ae}{cell_h}{cell_f}{cell_d}" \
+            text = f"{cell_c}{cell_b}{cell_z}{cell_aa}{cell_ab}{cell_j}{cell_p}{cell_q}{cell_r}{cell_s}{cell_ae}{cell_h}{cell_f}{cell_d}" \
                    f"{cell_ac}{cell_g}{cell_i}{cell_am}\n\n{HEADER_BEFORE_TEXTS}\n{TEXT_2}\n{TEXT_3}\n{TEXT_4}"
 
     return text
