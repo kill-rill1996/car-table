@@ -176,7 +176,7 @@ def get_description_rule_2(row: List, mmg: List, rule2_1: bool = None) -> str:
     else:
         cell_r = f"Поколение {mmg[2].strip()}" + " "
 
-    cell_u = f"Тип кузова {row[18].strip()}" + " " if row[18].strip() else ""
+    cell_s = f"Тип кузова {row[18].strip()}" + " " if row[18].strip() else ""
     cell_ae = f"Доп инф {row[30].strip()}" + " " if row[30].strip() else ""
     cell_h = f"Номер детали {row[7].strip()}" + " " if row[7].strip() else ""
     cell_f = f"ОЕМ {row[5].strip()}" + " " if row[5].strip() else ""
@@ -189,10 +189,10 @@ def get_description_rule_2(row: List, mmg: List, rule2_1: bool = None) -> str:
     # разные тексты для "Б/у" и "Новое"
     if row[1] == "Б/у":
         if rule2_1:
-            text = f"{cell_c}{cell_b}{cell_z}{cell_aa}{cell_ab}{cell_j}{cell_p}{cell_q}{cell_r}{cell_u}{cell_ae}{cell_h}{cell_f}{cell_d}" \
+            text = f"{cell_c}{cell_b}{cell_z}{cell_aa}{cell_ab}{cell_j}{cell_p}{cell_q}{cell_r}{cell_s}{cell_ae}{cell_h}{cell_f}{cell_d}" \
                    f"{cell_ac}{cell_g}{cell_i}{cell_am}\n\n{HEADER_BEFORE_TEXTS}\n{TEXT_12}\n{TEXT_1}\n{TEXT_2}\n{TEXT_3}\n{TEXT_4}\n{TEXT_5}\n{TEXT_7}"
         else:
-            text = f"{cell_c}{cell_b}{cell_z}{cell_aa}{cell_ab}{cell_j}{cell_p}{cell_q}{cell_r}{cell_u}{cell_ae}{cell_h}{cell_f}{cell_d}" \
+            text = f"{cell_c}{cell_b}{cell_z}{cell_aa}{cell_ab}{cell_j}{cell_p}{cell_q}{cell_r}{cell_s}{cell_ae}{cell_h}{cell_f}{cell_d}" \
                    f"{cell_ac}{cell_g}{cell_i}{cell_am}\n\n{HEADER_BEFORE_TEXTS}\n{TEXT_1}\n{TEXT_2}\n{TEXT_3}\n{TEXT_4}\n{TEXT_5}\n{TEXT_7}"
 
     # Новое
@@ -216,7 +216,7 @@ def get_description_rule_3(row: List, mmg: List, rule3_2: bool = None, rule3_3: 
     cell_v = f"Модель двигателя {row[21].strip()}" + " " if row[21].strip() else ""
     cell_w = row[22].strip() + " " if row[22].strip() else ""
     cell_x = f'Объем {row[23].replace("R", "").strip()}' + " " if row[23].replace("R", "").strip() else ''
-    cell_u = f"Привод {row[18].strip()}" + " " if row[18].strip() else ""
+    cell_u = f"Привод {row[20].strip()}" + " " if row[20].strip() else ""
     cell_z = f"сторона {row[25].strip()}" + " " if row[25].strip() else ""
     cell_aa = f"положение {row[26].strip()}" + " " if row[26].strip() else ""
     cell_ab = f"расположение {row[27].strip()}" + " " if row[27].strip() else ""
