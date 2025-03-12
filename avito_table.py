@@ -128,7 +128,8 @@ class AvitoTable:
                     "engine": row[21],
                     "detail_number": row[7],
                     "price": self._get_price(row[14], "commission_drom"),
-                    "country": row[35]
+                    "country": row[35],
+                    "code": row[38]
                 }
                 correct_row = self._create_correct_row_for_drom(result_row, add_params)
                 self.write_to_drom_file(correct_row)
@@ -449,7 +450,7 @@ class AvitoTable:
         new_row = []
 
         new_row.append(avito_row[0])    # Артикул
-        new_row.append(avito_row[6] + "_" + avito_row[0])    # Наименование товара
+        new_row.append(avito_row[6] + add_params["code"])    # Наименование товара
         new_row.append(avito_row[15])   # Новый/б.у.
         new_row.append(avito_row[20])   # Марка
         new_row.append(avito_row[21])   # Модель
