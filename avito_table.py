@@ -175,11 +175,11 @@ class AvitoTable:
         # заранее получаем make model generation
         make_model_generation = self._get_make_model_generation(csv_row[15], csv_row[16], csv_row[17])
 
-        result_row.append(str(csv_row[2]).strip() + " " + str(csv_row[1]).strip()
+        result_row.append((str(csv_row[2]).strip() + " " + str(csv_row[1]).strip()
                           + " " + str(make_model_generation[0])
                           + " " + str(make_model_generation[1])
                           + " " + str(make_model_generation[2])
-                          + " " + csv_row[38].strip())  # Title
+                          + " " + csv_row[38].strip())[:50])  # Title
 
         if self.config["version"] == "windows":
             result_row.append(self.config["goods_type"].encode("cp1251").decode("utf-8"))  # GoodsType
