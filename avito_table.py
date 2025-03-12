@@ -128,7 +128,7 @@ class AvitoTable:
                     "engine": row[21],
                     "detail_number": row[7],
                     "price": self._get_price(row[14], "commission_drom"),
-                    "country": row[34]
+                    "country": row[33]
                 }
                 correct_row = self._create_correct_row_for_drom(result_row, add_params)
                 self.write_to_drom_file(correct_row)
