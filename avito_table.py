@@ -129,7 +129,7 @@ class AvitoTable:
                     "detail_number": row[7],
                     "price": self._get_price(row[14], "commission_drom"),
                     "country": row[35],
-                    "code": row[38]
+                    "title": row[2] + row[38]
                 }
                 correct_row = self._create_correct_row_for_drom(result_row, add_params)
                 self.write_to_drom_file(correct_row)
@@ -172,7 +172,14 @@ class AvitoTable:
             result_row.append(self.config["address"])  # Address
             result_row.append(self.config["category"])  # Category
 
-        result_row.append(csv_row[2])  # Title
+        # заранее получаем make model generation
+        make_model_generation = self._get_make_model_generation(csv_row[15], csv_row[16], csv_row[17])
+
+        result_row.append(str(csv_row[2]).strip() + " " + str(csv_row[1]).strip()
+                          + " " + str(make_model_generation[0])
+                          + " " + str(make_model_generation[1])
+                          + " " + str(make_model_generation[2])
+                          + " " + csv_row[38].strip())  # Title
 
         if self.config["version"] == "windows":
             result_row.append(self.config["goods_type"].encode("cp1251").decode("utf-8"))  # GoodsType
@@ -189,9 +196,6 @@ class AvitoTable:
         result_row.append(product_info[2])  # EngineSparePartType
         result_row.append(product_info[3])  # BodySparePartType
         result_row.append(product_info[4])  # DeviceType
-
-        # заранее получаем make model generation
-        make_model_generation = self._get_make_model_generation(csv_row[15], csv_row[16], csv_row[17])
 
         description = get_description(csv_row, make_model_generation)
         result_row.append(description)  # Description
@@ -450,7 +454,7 @@ class AvitoTable:
         new_row = []
 
         new_row.append(avito_row[0])    # Артикул
-        new_row.append(avito_row[6] + add_params["code"])    # Наименование товара
+        new_row.append(add_params["title"])    # Наименование товара
         new_row.append(avito_row[15])   # Новый/б.у.
         new_row.append(avito_row[20])   # Марка
         new_row.append(avito_row[21])   # Модель
