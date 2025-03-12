@@ -110,7 +110,8 @@ class AvitoTable:
                 self.write_xml_file(row, add_params_for_xml)
 
             # запись для чтения
-            self.write_to_csv_file(result_row)
+            if not row[31] == "НЕАВИТО":
+                self.write_to_csv_file(result_row)
 
             if self.config["need_upload_file"]:
                 # запись для отправки
@@ -126,7 +127,8 @@ class AvitoTable:
                     "units_of_meas": row[8],
                     "engine": row[21],
                     "detail_number": row[7],
-                    "price": self._get_price(row[14], "commission_drom")
+                    "price": self._get_price(row[14], "commission_drom"),
+                    "country": row[34]
                 }
                 correct_row = self._create_correct_row_for_drom(result_row, add_params)
                 self.write_to_drom_file(correct_row)
@@ -178,7 +180,9 @@ class AvitoTable:
             result_row.append(self.config["goods_type"])  # GoodsType
             result_row.append(self.config["ad_type"])  # AdType
 
-        product_info = self._get_product_types(csv_row[12], csv_row[13])
+        is_truck = csv_row[37] == "Грузовые"
+
+        product_info = self._get_product_types(csv_row[12], csv_row[13], is_truck)
         result_row.append(product_info[0])  # ProductType
         result_row.append(product_info[1])  # SparePartType
         result_row.append(product_info[2])  # EngineSparePartType
@@ -239,10 +243,14 @@ class AvitoTable:
 
         return result_row
 
-    def _get_product_types(self, group_m: str, sub_group_n: str) -> list:
+    def _get_product_types(self, group_m: str, sub_group_n: str, is_truck: bool) -> list:
         """Сопоставляем М (12), N (13) с G в таблице соответствия и полями B(1), C(2), D(3) заполняет поля J, K, L"""
         result = []
         for row in self.PRODUCT_TYPES:
+            # TODO
+            if is_truck:
+                pass
+
             if row[6] == group_m and row[7] == sub_group_n:
                 result.append(row[0])
                 result.append(row[1])
@@ -475,6 +483,7 @@ class AvitoTable:
         new_row.append(add_params["detail_number"])  # номер детали TODO
         new_row.append(add_params["units_of_meas"])    # ед. изм TODO
         new_row.append(avito_row[18])   # фотографии
+        new_row.append(add_params["country"]) # страна
         return new_row
 
     def init_csv_result_file(self, to_upload: bool = False):
@@ -500,7 +509,7 @@ class AvitoTable:
     def init_drom_result_file(self):
         header = ["Артикул", "Наименование товара", "Новый/б.у.", "Марка", "Модель", "Кузов", "Номер",
                   "Двигатель", "Год", "L-R", "F-R", "U-D", "Цвет", "Примечание", "Количество", "Цена",
-                  "Наличие", "№ Детали", "Ед.изм", "Фотографии"]
+                  "Наличие", "№ Детали", "Ед.изм", "Фотографии", "Страна"]
         result_encoding = self.config["result_encoding_drom"]
 
         with open(self.config['result_encoding_drom_filename'], "w", newline="\n", encoding=result_encoding) as file:

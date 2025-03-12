@@ -13,7 +13,7 @@
   "availability": "В наличии",
   "ad_status": "Free",
   "1C_file_encoding": "cp1251",
-  "max_rows": 100,
+  "max_rows": 5000,
   "version": "windows",
   "result_encoding_upload": "utf-8",
   "result_encoding_upload_filename": "result_avito.csv",
@@ -25,5 +25,5 @@
   "need_drom_file": true,
   "xml_filename": "result.xml",
   "xml_file_encoding": "utf-8",
-  "need_xml_file": true
+  "need_xml_file": false
 }
